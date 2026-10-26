@@ -5,7 +5,7 @@ import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/factory/site_proxy_factory.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart' as forumcopilot_sdk;
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseMessageDetails, DiscoursePostProxy;
+    show DiscourseMentionCandidate, DiscourseMessageDetails, DiscoursePostProxy;
 import 'package:discourse_ui/views/widgets/message_compose_page.dart';
 import 'package:discourse_ui/views/widgets/post_needs_approval_dialog.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
@@ -31,6 +31,13 @@ class ReplyPage extends StatefulWidget {
   /// Discourse's reply_to_post_number, so that post's author is notified.
   final int? replyToPostNumber;
 
+  /// That post's author, offered first when `@` is typed.
+  final int? replyToUserId;
+
+  /// The topic's people as its page has loaded them, newest posters first:
+  /// what `@` offers before the forum answers.
+  final List<DiscourseMentionCandidate> mentionPeople;
+
   const ReplyPage({
     super.key,
     required this.siteContext,
@@ -43,6 +50,8 @@ class ReplyPage extends StatefulWidget {
     this.postId,
     this.isQuote = false,
     this.replyToPostNumber,
+    this.replyToUserId,
+    this.mentionPeople = const [],
   });
 
   @override
@@ -350,6 +359,9 @@ class _ReplyPageState extends State<ReplyPage> {
             contentController: _contentController,
             contentHint: AppLocalizations.of(context)!.writeYourReply,
             onSubmit: _handleSubmitWithDraftDiscard,
+            mentionPeople: widget.mentionPeople,
+            mentionTopicId: int.tryParse(widget.threadId),
+            replyToUserId: widget.replyToUserId,
             hasChanges: () => _draftController.changedSinceOpened,
             onSaveDraft: _draftController.flushNow,
             onDiscard: _draftController.discard,
@@ -416,6 +428,9 @@ class _ReplyPageState extends State<ReplyPage> {
         contentController: _contentController,
         contentHint: AppLocalizations.of(context)!.writeYourReply,
         onSubmit: _handleSubmitWithDraftDiscard,
+        mentionPeople: widget.mentionPeople,
+        mentionTopicId: int.tryParse(widget.threadId),
+        replyToUserId: widget.replyToUserId,
         hasChanges: () => _draftController.changedSinceOpened,
         onSaveDraft: _draftController.flushNow,
         onDiscard: _draftController.discard,

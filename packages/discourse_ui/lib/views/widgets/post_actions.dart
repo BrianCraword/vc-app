@@ -18,6 +18,7 @@ import '../../theme/design_tokens.dart';
 import 'package:discourse_ui/core/logging/app_logger.dart';
 import 'package:discourse_ui/views/widgets/discourse_report_dialog.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
+import 'package:discourse_ui/utils/mention_suggester.dart';
 import '../../l10n/kit_strings.dart';
 
 class PostActionsHandler {
@@ -43,13 +44,44 @@ class PostActionsHandler {
   /// The number of the loaded post [postId], which a reply to it must name
   /// (reply_to_post_number). Null for a reply to the topic ('' from the
   /// bottom bar) or a post not in the loaded window.
-  int? _postNumberOf(String postId) {
+  FCPost? _loadedPost(String postId) {
     if (postId.isEmpty) return null;
     final posts = _postsController.threadDataOutput.value?.posts ?? const [];
     for (final p in posts) {
-      if (p.id == postId) return p.postNumber;
+      if (p.id == postId) return p;
     }
     return null;
+  }
+
+  /// The reply's `@` offers: the replied-to post's author, then the topic's
+  /// newest posters, from the posts loaded.
+  ReplyPage _replyPage({
+    required String threadId,
+    required String? forumId,
+    required String topicTitle,
+    required String postId,
+    String? quotePostId,
+    String? quoteText,
+    String? quoteAuthor,
+    bool isQuote = false,
+  }) {
+    final replyTo = _loadedPost(postId);
+    return ReplyPage(
+      siteContext: siteContext,
+      threadId: threadId,
+      forumId: forumId,
+      quotePostId: quotePostId,
+      quoteText: quoteText,
+      quoteAuthor: quoteAuthor,
+      topicTitle: topicTitle,
+      postId: postId,
+      isQuote: isQuote,
+      replyToPostNumber: replyTo?.postNumber,
+      replyToUserId: int.tryParse(replyTo?.authorId ?? ''),
+      mentionPeople: topicMentionPeople(
+          _postsController.threadDataOutput.value?.posts ?? const [],
+          replyTo: replyTo),
+    );
   }
 
   Future<void> handleReply(BuildContext context, String postId, String topicId, String topicTitle, void Function([String? scrollToPostId]) onRefresh) async {
@@ -175,14 +207,11 @@ class PostActionsHandler {
     final result = await Navigator.push<dynamic>(
       context,
       FormPageRoute(
-        builder: (context) => ReplyPage(
-          siteContext: siteContext,
+        builder: (context) => _replyPage(
           threadId: actualTopicId!,
           forumId: forumId,
           topicTitle: topicTitle,
           postId: postId,
-          isQuote: false,
-          replyToPostNumber: _postNumberOf(postId),
         ),
       ),
     );
@@ -293,8 +322,7 @@ class PostActionsHandler {
     final result = await Navigator.push<dynamic>(
       context,
       FormPageRoute(
-        builder: (context) => ReplyPage(
-          siteContext: siteContext,
+        builder: (context) => _replyPage(
           threadId: actualTopicId!,
           forumId: forumId,
           quotePostId: postId,
@@ -303,7 +331,6 @@ class PostActionsHandler {
           topicTitle: topicTitle,
           postId: postId,
           isQuote: true,
-          replyToPostNumber: _postNumberOf(postId),
         ),
       ),
     );

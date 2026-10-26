@@ -207,6 +207,8 @@ class _NewTopicPageState extends State<NewTopicPage> {
       titleController: _titleController,
       contentController: _contentController,
       onSubmit: _handleSubmitWithDraftDiscard,
+      // The category's posters come first when `@` is typed.
+      mentionCategoryId: int.tryParse(widget.forumId),
       hasChanges: () => _draftController.changedSinceOpened,
       onSaveDraft: _draftController.flushNow,
       onDiscard: _draftController.discard,

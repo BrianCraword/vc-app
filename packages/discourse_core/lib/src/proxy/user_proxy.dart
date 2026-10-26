@@ -11,6 +11,7 @@ import '../base_discourse_proxy.dart';
 import '../context/discourse_site_context_extension.dart';
 import '../data/site/discourse_site_capabilities.dart';
 import '../data/user/discourse_do_not_disturb.dart';
+import '../data/user/discourse_mention_candidate.dart';
 import '../data/user/discourse_profile.dart';
 import '../data/user/discourse_pending_post.dart';
 import '../data/user/discourse_user_profile_extras.dart';
@@ -1001,6 +1002,67 @@ class DiscourseUserProxy extends BaseDiscourseProxy implements IFCUserProxy {
     DiscourseUserSearchGroups groups = DiscourseUserSearchGroups.messageable,
   }) =>
       _searchUsers(keywords, groups);
+
+  /// Discourse-only: who an `@` being typed in a post could name, as the
+  /// web composer's mention autocomplete asks (d-editor → userSearch).
+  ///
+  /// With a [topicId] (a reply or an edit) the topic's posters come first,
+  /// the viewer left out, and [prioritizedUserId] (the author of the post
+  /// being replied to) before them; with a [categoryId] (a new topic) the
+  /// category's posters do (UserSearch#search_ids). Either lets an empty
+  /// [term] answer, which is what `@` alone shows; with neither, an empty
+  /// term has no answer and is not asked. Groups come only with a term,
+  /// and only the ones the viewer may mention, as the mention picker
+  /// offers them ([DiscourseUserSearchGroups.mentionable]).
+  ///
+  /// Suggestions are a convenience: a failure is an empty list, and the
+  /// composer's @ button still searches.
+  Future<List<DiscourseMentionCandidate>> searchMentionsAsync(
+    String term, {
+    int? topicId,
+    int? categoryId,
+    int? prioritizedUserId,
+  }) async {
+    if (term.isEmpty && topicId == null && categoryId == null) return const [];
+    try {
+      final response = await apiGet('/u/search/users.json', query: {
+        'term': term,
+        if (topicId != null) 'topic_id': '$topicId',
+        if (categoryId != null) 'category_id': '$categoryId',
+        if (prioritizedUserId != null)
+          'prioritized_user_id': '$prioritizedUserId',
+        if (term.isNotEmpty) 'include_mentionable_groups': 'true',
+        // The web's limit; the composer shows five.
+        'limit': '6',
+      });
+      String? avatar(Object? template) {
+        final tpl = template?.toString();
+        if (tpl == null || tpl.isEmpty) return null;
+        return absoluteSiteUrl(siteContext.site.url, tpl.replaceAll('{size}', '48'));
+      }
+
+      return [
+        for (final raw in ((response['users'] as List?) ?? const []).whereType<Map>())
+          if ((raw['username'] ?? '').toString().isNotEmpty)
+            (
+              username: raw['username'].toString(),
+              name: raw['name']?.toString(),
+              avatarUrl: avatar(raw['avatar_template']),
+              isGroup: false,
+            ),
+        for (final raw in ((response['groups'] as List?) ?? const []).whereType<Map>())
+          if ((raw['name'] ?? '').toString().isNotEmpty)
+            (
+              username: raw['name'].toString(),
+              name: raw['full_name']?.toString(),
+              avatarUrl: null,
+              isGroup: true,
+            ),
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
 
   /// For a message's recipients (the SDK's only user picker): people and
   /// the groups the viewer may message.

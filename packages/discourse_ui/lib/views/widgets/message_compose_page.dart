@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:discourse_core/discourse_core.dart'
     show
         DiscourseMediaOptimizationContext,
+        DiscourseMentionCandidate,
+        DiscourseSiteCapabilities,
         DiscourseUploadKind,
+        DiscourseUserProxy,
         discourseUploadKind,
         discourseUploadMarkdown;
 import '../../utils/discourse_markup.dart';
@@ -22,10 +25,12 @@ import '../../theme/design_tokens.dart';
 import '../../settings_context.dart';
 import '../../utils/image_optimize.dart';
 import '../../utils/image_shrink.dart';
+import '../../utils/mention_suggester.dart';
 import 'oversized_image_sheet.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 import 'category_badge.dart';
 import 'upload_tile.dart';
+import 'user_avatar.dart';
 import '../../utils/error_message.dart';
 import '../../utils/snackbar_helper.dart';
 import 'package:discourse_ui/utils/app_navigation.dart';
@@ -114,6 +119,23 @@ class MessageComposePage extends StatefulWidget {
   /// transitions at once. Null (or a null answer) closes the composer.
   final Widget? Function()? pageAfterSubmit;
 
+  /// Who `@` offers at once: the topic's people as its page has loaded
+  /// them, newest posters first ([MentionSuggester]).
+  final List<DiscourseMentionCandidate> mentionPeople;
+
+  /// Where the forum looks first for who an `@` could name, as the web
+  /// composer scopes its mention search: the topic a reply or an edit is
+  /// in, else a new topic's category. [replyToUserId] (the author of the
+  /// post being replied to) comes before the topic's other people.
+  final int? mentionTopicId;
+  final int? mentionCategoryId;
+  final int? replyToUserId;
+
+  /// Asks the forum for `@` suggestions; by default
+  /// [DiscourseUserProxy.searchMentionsAsync] with the scope above. A test's
+  /// stands in for the forum.
+  final MentionSearch? mentionSearch;
+
   const MessageComposePage({
     super.key,
     required this.siteContext,
@@ -149,6 +171,11 @@ class MessageComposePage extends StatefulWidget {
     this.onDiscard,
     this.isEdit = false,
     this.pageAfterSubmit,
+    this.mentionPeople = const [],
+    this.mentionTopicId,
+    this.mentionCategoryId,
+    this.replyToUserId,
+    this.mentionSearch,
   });
 
   @override
@@ -196,6 +223,37 @@ class _MessageComposePageState extends State<MessageComposePage> {
   bool get _waitingForUploads =>
       _sendWaitedForUploads && _uploads.any((u) => u.isUploading);
 
+  /// Whether `@` names anyone on this forum: the web neither suggests nor
+  /// completes mentions where the forum turned them off.
+  bool get _canMention =>
+      DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl)
+          .enableMentions;
+
+  /// Who the `@name` being typed could be, offered above the toolbar.
+  late final MentionSuggester _mentions = MentionSuggester(
+    search: (term) => (widget.mentionSearch ??
+        (term) => DiscourseUserProxy(widget.siteContext).searchMentionsAsync(
+              term,
+              topicId: widget.mentionTopicId,
+              categoryId: widget.mentionCategoryId,
+              prioritizedUserId: widget.replyToUserId,
+            ))(term),
+    people: widget.mentionPeople,
+    selfUsername: widget.siteContext.loginDataOutput?.user?.username,
+  );
+
+  void _followMention() {
+    if (_canMention) _mentions.update(_contentController.value);
+  }
+
+  /// Puts [candidate]'s mention in place of the `@name` being typed.
+  void _pickMention(DiscourseMentionCandidate candidate) {
+    final next = MentionSuggester.complete(_contentController.value, candidate);
+    if (next == null) return;
+    _contentController.value = next;
+    _contentFocusNode.requestFocus();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -242,6 +300,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
     _contentController.addListener(_dropUploadsTakenOutOfText);
     _titleController.addListener(_clearMissingTitle);
     _contentController.addListener(_clearMissingContent);
+    _contentController.addListener(_followMention);
 
     // Listen to focus changes
     _contentFocusNode.addListener(() {
@@ -254,6 +313,14 @@ class _MessageComposePageState extends State<MessageComposePage> {
   @override
   void didUpdateWidget(MessageComposePage oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.mentionPeople != oldWidget.mentionPeople) {
+      _mentions.people = widget.mentionPeople;
+    }
+    if (widget.mentionTopicId != oldWidget.mentionTopicId ||
+        widget.mentionCategoryId != oldWidget.mentionCategoryId ||
+        widget.replyToUserId != oldWidget.replyToUserId) {
+      _mentions.forgetAnswers();
+    }
     // Update content if initialContent changed from null to a value (quote loaded)
     // Only update if the composer is effectively empty or still shows the
     // previous initialContent. Never clobber other non-empty content — a
@@ -290,6 +357,8 @@ class _MessageComposePageState extends State<MessageComposePage> {
     // The page may own the controllers and outlive this state.
     _titleController.removeListener(_clearMissingTitle);
     _contentController.removeListener(_clearMissingContent);
+    _contentController.removeListener(_followMention);
+    _mentions.dispose();
     // Only dispose controllers if we own them
     if (_ownsTitleController) {
       _titleController.dispose();
@@ -1147,6 +1216,46 @@ class _MessageComposePageState extends State<MessageComposePage> {
     );
   }
 
+  /// Who the `@name` being typed could be, a tap away, above the toolbar
+  /// while the text is being written. The @ button still searches.
+  Widget _buildMentionStrip() => ListenableBuilder(
+        listenable: _mentions,
+        builder: (context, _) {
+          final people = _mentions.suggestions;
+          if (people.isEmpty || !_isContentFieldFocused) {
+            return const SizedBox.shrink();
+          }
+          return SizedBox(
+            height: 48,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(
+                horizontal: DesignTokens.spacingL,
+                vertical: DesignTokens.spacingXS,
+              ),
+              itemCount: people.length,
+              separatorBuilder: (_, __) =>
+                  const SizedBox(width: DesignTokens.spacingS),
+              itemBuilder: (context, i) {
+                final c = people[i];
+                return ActionChip(
+                  avatar: c.isGroup
+                      ? const Icon(Icons.group_outlined)
+                      : UserAvatar(
+                          username: c.username,
+                          iconUrl: c.avatarUrl,
+                          radius: 12,
+                        ),
+                  label: Text(c.username),
+                  tooltip: (c.name ?? '').isEmpty ? null : c.name,
+                  onPressed: () => _pickMention(c),
+                );
+              },
+            ),
+          );
+        },
+      );
+
   Widget _buildBottomToolbar() {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -1371,12 +1480,14 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 ],
                 ),
               ),
-              // Mention button
-              IconButton(
-                icon: Icon(Icons.alternate_email, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
-                tooltip: AppLocalizations.of(context)!.mentionUser,
-                onPressed: _isContentFieldFocused ? _handleMention : null,
-              ),
+              // Mention button: the full search, where the strip above
+              // offers the likely few.
+              if (_canMention)
+                IconButton(
+                  icon: Icon(Icons.alternate_email, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
+                  tooltip: AppLocalizations.of(context)!.mentionUser,
+                  onPressed: _isContentFieldFocused ? _handleMention : null,
+                ),
               // Discourse whisper toggle (staff-only reply mode)
               if (widget.showWhisperToggle)
                 IconButton(
@@ -1636,6 +1747,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
               ),
               _buildContentMissingLine(),
               _buildUploadStrip(),
+              _buildMentionStrip(),
               _buildBottomToolbar(),
             ],
           ),

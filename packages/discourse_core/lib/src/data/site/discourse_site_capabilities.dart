@@ -237,6 +237,10 @@ class DiscourseSiteCapabilities {
   /// minimum length.
   bool preventUploadsOnlyPosts = false;
 
+  /// `enable_mentions`: an `@name` in a post names someone. Off, the web
+  /// composer neither suggests nor completes them, and nor does the app's.
+  bool enableMentions = true;
+
   /// True once a real payload has been parsed for this forum. Distinguishes
   /// "asked, offers nothing" from "never asked".
   bool resolved = false;
@@ -449,6 +453,7 @@ class DiscourseSiteCapabilities {
     caps.maxPostLength = positive('max_post_length') ?? caps.maxPostLength;
     caps.preventUploadsOnlyPosts =
         settings['prevent_uploads_only_posts'] == true;
+    caps.enableMentions = settings['enable_mentions'] != false;
   }
 
   /// Records each category's topics of the past week from a

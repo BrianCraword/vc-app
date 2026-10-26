@@ -295,6 +295,7 @@ class _EditPostPageState extends State<EditPostPage> {
           contentHint: AppLocalizations.of(context)!.editYourPostHint,
           autoFocusContent: false, // Don't auto-focus any field when editing
           onSubmit: _handleSubmit,
+          mentionTopicId: int.tryParse(widget.topicId ?? ''),
           isEdit: true,
           onFileUpload: (widget.siteContext.loginDataOutput?.canUploadAttachment ?? false) ? _handleFileUpload : null,
           topicTitle: widget.topicTitle,
