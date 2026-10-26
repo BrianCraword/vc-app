@@ -183,6 +183,18 @@ class _MessageComposePageState extends State<MessageComposePage> {
   bool _includeSignature = false; // Opt-in where a page offers it
   bool _isWhisper = false; // Discourse staff whisper mode
 
+  /// Send found the field empty: it says so under the field until the
+  /// writer puts something in it. A SnackBar said it before, pointing at
+  /// nothing, and was gone by the time the writer looked for the field.
+  bool _titleMissing = false;
+  bool _contentMissing = false;
+
+  /// Send was tapped while files were still uploading: the uploads row says
+  /// so ([_waitingForUploads]) until they have landed.
+  bool _sendWaitedForUploads = false;
+
+  bool get _waitingForUploads =>
+      _sendWaitedForUploads && _uploads.any((u) => u.isUploading);
 
   @override
   void initState() {
@@ -228,6 +240,8 @@ class _MessageComposePageState extends State<MessageComposePage> {
     });
 
     _contentController.addListener(_dropUploadsTakenOutOfText);
+    _titleController.addListener(_clearMissingTitle);
+    _contentController.addListener(_clearMissingContent);
 
     // Listen to focus changes
     _contentFocusNode.addListener(() {
@@ -256,9 +270,26 @@ class _MessageComposePageState extends State<MessageComposePage> {
     }
   }
 
+  /// Written in (by the writer, a restored draft, an upload's Markdown): the
+  /// field is no longer missing.
+  void _clearMissingTitle() {
+    if (_titleMissing && _titleController.text.trim().isNotEmpty) {
+      setState(() => _titleMissing = false);
+    }
+  }
+
+  void _clearMissingContent() {
+    if (_contentMissing && _contentController.text.trim().isNotEmpty) {
+      setState(() => _contentMissing = false);
+    }
+  }
+
   @override
   void dispose() {
     _contentController.removeListener(_dropUploadsTakenOutOfText);
+    // The page may own the controllers and outlive this state.
+    _titleController.removeListener(_clearMissingTitle);
+    _contentController.removeListener(_clearMissingContent);
     // Only dispose controllers if we own them
     if (_ownsTitleController) {
       _titleController.dispose();
@@ -600,6 +631,9 @@ class _MessageComposePageState extends State<MessageComposePage> {
   /// paragraphs, a draft lost them, and removing one from the list left its
   /// Markdown behind.
   Future<void> _uploadAll(List<XFile> files) async {
+    // A Send that waited for earlier uploads is over once they have landed;
+    // these new ones were not part of it.
+    if (!_uploads.any((u) => u.isUploading)) _sendWaitedForUploads = false;
     final added = <_PendingUpload>[];
     for (final file in files) {
       // Unique against the ones already made for this batch too.
@@ -967,21 +1001,25 @@ class _MessageComposePageState extends State<MessageComposePage> {
   }
 
   Future<void> _submit() async {
-    if (widget.showTitleField && widget.requireTitle && _titleController.text.trim().isEmpty) {
-      _showNotice(AppLocalizations.of(context)!.pleaseEnterTitle);
-      return;
-    }
-
-    if (_contentController.text.trim().isEmpty) {
-      _showNotice(AppLocalizations.of(context)!.pleaseEnterContent);
+    // An empty field says so under itself, and the cursor goes to the first.
+    final titleMissing = widget.showTitleField &&
+        widget.requireTitle &&
+        _titleController.text.trim().isEmpty;
+    final contentMissing = _contentController.text.trim().isEmpty;
+    if (titleMissing || contentMissing) {
+      setState(() {
+        _titleMissing = titleMissing;
+        _contentMissing = contentMissing;
+      });
+      (titleMissing ? _titleFocusNode : _contentFocusNode).requestFocus();
       return;
     }
 
     // Don't post while an attachment upload is still in flight — the
     // upload's short_url wouldn't be included yet and the attachment
-    // would silently be dropped from the post.
+    // would silently be dropped from the post. The uploads row says so.
     if (_uploads.any((u) => u.isUploading)) {
-      _showNotice(AppLocalizations.of(context)!.pleaseWaitForAttachmentsToFinishUploading);
+      setState(() => _sendWaitedForUploads = true);
       return;
     }
 
@@ -1045,7 +1083,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
   /// change, and the only place an upload appeared at all.)
   Widget _buildUploadStrip() {
     if (_uploads.isEmpty) return const SizedBox.shrink();
-    return SizedBox(
+    final strip = SizedBox(
       height: UploadTile.extent + DesignTokens.spacingS,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
@@ -1064,6 +1102,46 @@ class _MessageComposePageState extends State<MessageComposePage> {
           path: _uploads[i].file.path,
           uploading: _uploads[i].isUploading,
           onRemove: () => _removeUpload(_uploads[i]),
+        ),
+      ),
+    );
+    if (!_waitingForUploads) return strip;
+    // Why Send did nothing, over the files it is waiting for.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _problemLine(AppLocalizations.of(context)!
+            .pleaseWaitForAttachmentsToFinishUploading),
+        strip,
+      ],
+    );
+  }
+
+  /// Send found no text: said where it shows with the keyboard up, right
+  /// under the page with the field and over the toolbar.
+  Widget _buildContentMissingLine() {
+    if (!_contentMissing) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: DesignTokens.spacingXS),
+      child: _problemLine(AppLocalizations.of(context)!.pleaseEnterContent),
+    );
+  }
+
+  /// Why Send did nothing, in the error colour, read out as it appears.
+  /// At the start of the line, as a field's own error.
+  Widget _problemLine(String message) {
+    return Container(
+      alignment: AlignmentDirectional.centerStart,
+      padding: const EdgeInsets.fromLTRB(DesignTokens.spacingL, 0,
+          DesignTokens.spacingL, DesignTokens.spacingXS),
+      child: Semantics(
+        liveRegion: true,
+        child: Text(
+          message,
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.copyWith(color: Theme.of(context).colorScheme.error),
         ),
       ),
     );
@@ -1498,6 +1576,10 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                   hintText: widget.titleHint ??
                                       AppLocalizations.of(context)!
                                           .composerTitleHint,
+                                  errorText: _titleMissing
+                                      ? AppLocalizations.of(context)!
+                                          .pleaseEnterTitle
+                                      : null,
                                 ),
                                 textCapitalization: TextCapitalization.sentences,
                                 enabled: !_isSubmitting,
@@ -1524,6 +1606,13 @@ class _MessageComposePageState extends State<MessageComposePage> {
                                           .composerContentHint,
                                   alignLabelWithHint: true,
                                   floatingLabelBehavior: FloatingLabelBehavior.always,
+                                  // Outlined in red; the words go over the
+                                  // toolbar (_buildContentMissingLine). Ten
+                                  // lines tall, the field's own error line
+                                  // was under the keyboard.
+                                  error: _contentMissing
+                                      ? const SizedBox.shrink()
+                                      : null,
                                 ),
                                 enabled: !_isSubmitting,
                               ),
@@ -1545,6 +1634,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                   ],
                 ),
               ),
+              _buildContentMissingLine(),
               _buildUploadStrip(),
               _buildBottomToolbar(),
             ],

@@ -129,6 +129,23 @@ void main() {
     c.upload.complete(null);
   });
 
+  testWidgets('Send while a photo uploads says so over the uploads, '
+      'until it lands', (tester) async {
+    final c = await pumpComposer(tester);
+    await pickPhotos(tester, c);
+    const wait = 'Please wait for attachments to finish uploading';
+    expect(find.text(wait), findsNothing, reason: 'not before Send');
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Send'));
+    await tester.pump();
+    expect(find.text(wait), findsOneWidget);
+    expect(find.byType(SnackBar), findsNothing);
+
+    c.upload.complete('upload://abc.png');
+    await settleUntil(tester, () => c.text.text.contains('![image]'));
+    expect(find.text(wait), findsNothing);
+  });
+
   testWidgets('a failed upload takes its placeholder out', (tester) async {
     final c = await pumpComposer(tester);
     await pickPhotos(tester, c);

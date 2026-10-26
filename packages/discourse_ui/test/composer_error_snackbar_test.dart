@@ -89,8 +89,8 @@ void main() {
     expect(find.byType(SnackBar), findsNothing);
   });
 
-  testWidgets('a missing title says so once, however often Send is tapped',
-      (tester) async {
+  testWidgets('a missing title is said under the field, however often Send '
+      'is tapped', (tester) async {
     await open(tester, (_, __) async => true);
     await tester.enterText(find.byType(TextField).first, '');
     await tester.pump();
@@ -98,12 +98,9 @@ void main() {
     await send(tester);
     await send(tester);
     await send(tester);
-    expect(find.byType(SnackBar), findsOneWidget);
-
-    await tester.pump(const Duration(seconds: 4));
-    await tester.pumpAndSettle();
     expect(find.byType(SnackBar), findsNothing,
-        reason: 'no copies queued behind it');
+        reason: 'composer_field_errors_test has the rest');
+    expect(find.text('Please enter a title'), findsOneWidget);
   });
 
   test('a longer reason stays up longer, within 4–10 s', () {
