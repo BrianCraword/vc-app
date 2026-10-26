@@ -50,8 +50,12 @@ abstract class BaseDiscourseProxy {
   }
 
   /// A fresh GET bypasses both stored responses and older in-flight reads.
-  Future<Map<String, dynamic>> apiGetFresh(String path) async {
-    final result = await _client.get(siteContext, path, useCache: false);
+  Future<Map<String, dynamic>> apiGetFresh(
+    String path, {
+    Map<String, dynamic>? query,
+  }) async {
+    final result =
+        await _client.get(siteContext, path, query: query, useCache: false);
     return _decode(result, method: 'GET', path: path);
   }
 

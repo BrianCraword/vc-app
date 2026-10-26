@@ -21,21 +21,36 @@ class DiscourseForumProxy extends BaseDiscourseProxy implements IFCForumProxy {
   // Phase 5.41 — hex color, text color, topic/post counts and slug live
   // on FCForum itself so they survive the tree rebuild in [_buildTree].
 
+  /// [includeLatestTopics] (Discourse-only): each category's featured
+  /// topics come in the same response (`include_topics`), so the
+  /// Categories view's cards can say what is being discussed without a
+  /// request per category ([DiscourseSiteCapabilities.latestTopics]).
+  ///
+  /// [forceRefresh] skips the client's read cache, which keeps this list
+  /// for five minutes: a pull to refresh used to get the same list back.
   @override
   Future<FCForumDataResult> getForumAsync(
     bool returnDescription,
     String forumId,
-    bool forceRefresh,
-  ) async {
+    bool forceRefresh, {
+    bool includeLatestTopics = false,
+  }) async {
     try {
-      final response = await apiGet('/categories.json',
-          query: {'include_subcategories': 'true'});
+      final query = {
+        'include_subcategories': 'true',
+        if (includeLatestTopics) 'include_topics': 'true',
+      };
+      final response = forceRefresh
+          ? await apiGetFresh('/categories.json', query: query)
+          : await apiGet('/categories.json', query: query);
       final list = (response['category_list'] as Map<String, dynamic>?) ??
           const <String, dynamic>{};
       final raw = (list['categories'] as List?) ?? const [];
-      // Each category's "N new this week", which only this list carries.
+      // Each category's "N new this week" and latest topic, which only this
+      // list carries.
       DiscourseSiteCapabilities.storeCategoryActivity(
-          siteContext.site.pluginUrl, raw.whereType<Map<String, dynamic>>());
+          siteContext.site.pluginUrl, raw.whereType<Map<String, dynamic>>(),
+          withTopics: includeLatestTopics);
       final cats = _withSubcategories(
           raw.whereType<Map<String, dynamic>>().toList(growable: false));
 

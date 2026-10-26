@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseSiteCapabilities;
+    show DiscourseForumProxy, DiscourseSiteCapabilities;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/forumcopilot_sdk.dart';
 
@@ -75,8 +75,11 @@ class CategoriesListState extends State<CategoriesList> {
     _error = null;
     _changed();
     try {
-      final result =
-          await SiteProxyFactory.getForumProxy().getForumAsync(true, '', true);
+      // Each card's latest topic comes in the same response.
+      final proxy = SiteProxyFactory.getForumProxy();
+      final result = proxy is DiscourseForumProxy
+          ? await proxy.getForumAsync(true, '', true, includeLatestTopics: true)
+          : await proxy.getForumAsync(true, '', true);
       if (!mounted) return;
       if (!result.result) {
         // No reason from the forum: the heading alone says it

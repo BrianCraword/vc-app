@@ -1869,6 +1869,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String categoryLatestTopic(String title, String time) {
+    return '最新话题：$title，$time';
+  }
+
+  @override
   String get categoriesView => '类别';
 
   @override

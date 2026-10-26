@@ -2416,6 +2416,19 @@
       }
     }
   },
+  "categoryLatestTopic": "Latest topic: {title}, {time}",
+  "@categoryLatestTopic": {
+    "description": "Category card: what a screen reader says for the line naming the category's most recently posted-in topic and when; tapping it opens that topic",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String",
+        "description": "When it was last posted in, e.g. '3h' or 'Oct 12'"
+      }
+    }
+  },
   "categoriesView": "Categories",
   "@categoriesView": {
     "description": "The Categories view among a forum's Home views (Latest, New, Top, Categories)"

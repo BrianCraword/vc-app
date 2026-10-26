@@ -1890,6 +1890,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String categoryLatestTopic(String title, String time) {
+    return '최신 주제: $title, $time';
+  }
+
+  @override
   String get categoriesView => '카테고리';
 
   @override

@@ -1986,6 +1986,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String categoryLatestTopic(String title, String time) {
+    return 'Argomento più recente: $title, $time';
+  }
+
+  @override
   String get categoriesView => 'Categorie';
 
   @override

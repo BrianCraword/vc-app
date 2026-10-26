@@ -789,6 +789,7 @@
   "countMembers": "{count, plural, =1{{formatted} lid} other{{formatted} leden}}",
   "countTopics": "{count, plural, =1{{formatted} topic} other{{formatted} topics}}",
   "categoryNewThisWeek": "{count} nieuw deze week",
+  "categoryLatestTopic": "Nieuwste topic: {title}, {time}",
   "categoriesView": "Categorieën",
   "allCategories": "Alle categorieën",
   "allTags": "Alle tags",

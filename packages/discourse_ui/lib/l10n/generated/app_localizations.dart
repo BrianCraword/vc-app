@@ -3280,6 +3280,12 @@ abstract class AppLocalizations {
   /// **'{count} new this week'**
   String categoryNewThisWeek(int count);
 
+  /// Category card: what a screen reader says for the line naming the category's most recently posted-in topic and when; tapping it opens that topic
+  ///
+  /// In en, this message translates to:
+  /// **'Latest topic: {title}, {time}'**
+  String categoryLatestTopic(String title, String time);
+
   /// The Categories view among a forum's Home views (Latest, New, Top, Categories)
   ///
   /// In en, this message translates to:

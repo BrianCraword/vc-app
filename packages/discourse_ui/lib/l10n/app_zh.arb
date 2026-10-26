@@ -660,6 +660,7 @@
   "countMembers": "{count, plural, other{{formatted} 位成员}}",
   "countTopics": "{count, plural, other{{formatted} 个话题}}",
   "categoryNewThisWeek": "本周新增 {count}",
+  "categoryLatestTopic": "最新话题：{title}，{time}",
   "categoriesView": "类别",
   "allCategories": "所有类别",
   "allTags": "所有标签",

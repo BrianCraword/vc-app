@@ -660,6 +660,7 @@
   "countMembers": "{count, plural, =1{{formatted} membro} other{{formatted} membros}}",
   "countTopics": "{count, plural, =1{{formatted} tópico} other{{formatted} tópicos}}",
   "categoryNewThisWeek": "{count} novos esta semana",
+  "categoryLatestTopic": "Tópico mais recente: {title}, {time}",
   "categoriesView": "Categorias",
   "allCategories": "Todas as categorias",
   "allTags": "Todas as etiquetas",

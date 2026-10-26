@@ -1898,6 +1898,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String categoryLatestTopic(String title, String time) {
+    return '最新のトピック: $title、$time';
+  }
+
+  @override
   String get categoriesView => 'カテゴリ';
 
   @override

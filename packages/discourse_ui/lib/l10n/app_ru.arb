@@ -661,6 +661,7 @@
   "countMembers": "{count, plural, one{{formatted} участник} few{{formatted} участника} many{{formatted} участников} other{{formatted} участника}}",
   "countTopics": "{count, plural, one{{formatted} тема} few{{formatted} темы} many{{formatted} тем} other{{formatted} темы}}",
   "categoryNewThisWeek": "{count} новых за неделю",
+  "categoryLatestTopic": "Последняя тема: {title}, {time}",
   "categoriesView": "Категории",
   "allCategories": "Все категории",
   "allTags": "Все теги",

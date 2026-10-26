@@ -1,5 +1,5 @@
 import 'package:discourse_core/discourse_core.dart'
-    show DiscourseSiteCapabilities;
+    show DiscourseCategoryLatestTopic, DiscourseSiteCapabilities;
 import 'package:flutter/material.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_forum.dart';
@@ -7,7 +7,13 @@ import 'package:intl/intl.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../../utils/discourse_color.dart';
+import '../../utils/emoji_shortcodes.dart';
 import '../../utils/forum_navigation.dart';
+import '../../utils/time_utils.dart';
+import '../../services/notification_route.dart'
+    show DiscourseNotificationRoute;
+import '../lists/posts_list.dart' show PostsListMode;
+import '../post_page.dart';
 import '../widgets/category_badge.dart' show categoryMarkColor;
 import '../widgets/category_read_counts.dart';
 import '../widgets/category_tile_mark.dart';
@@ -30,8 +36,8 @@ String? categoryActivityLine(
 }
 
 /// A category in the forum's Categories view: its own mark and name, how
-/// active it is this week, two lines of description, and its subcategories
-/// as small chips. A band of its colour runs down the left edge, as on
+/// active it is this week, two lines of description, its latest topic, and
+/// its subcategories as small chips. A band of its colour runs down the left edge, as on
 /// Discourse's category badges; a bell marks one you watch or track.
 class CategoryCard extends StatelessWidget {
   const CategoryCard({
@@ -62,6 +68,8 @@ class CategoryCard extends StatelessWidget {
         : style?.description;
     final activity = categoryActivityLine(context, siteContext, forum);
     final subs = showSubcategories ? forum.childForums : const <FCForum>[];
+    final latest = DiscourseSiteCapabilities.forSite(siteContext.site.pluginUrl)
+        .latestTopics[int.tryParse(forum.id)];
 
     return Padding(
       padding: margin,
@@ -122,6 +130,12 @@ class CategoryCard extends StatelessWidget {
                           ?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                   ],
+                  if (latest != null)
+                    CategoryLatestTopicLine(
+                      siteContext: siteContext,
+                      topic: latest,
+                      forumId: forum.id,
+                    ),
                   CategoryReadCounts(
                     siteContext: siteContext,
                     categoryId: forum.id,
@@ -140,6 +154,85 @@ class CategoryCard extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// What is being discussed in a category, under its description: its
+/// latest topic's title and when it was last posted in. A tap opens the
+/// topic at its last post, as the Flarum app's tag cards do.
+class CategoryLatestTopicLine extends StatelessWidget {
+  const CategoryLatestTopicLine({
+    super.key,
+    required this.siteContext,
+    required this.topic,
+    required this.forumId,
+  });
+
+  final SiteContext siteContext;
+  final DiscourseCategoryLatestTopic topic;
+  final String forumId;
+
+  /// The topic, opened at its last post.
+  static PostPage pageFor(SiteContext siteContext,
+      DiscourseCategoryLatestTopic topic, String forumId) {
+    final last = topic.highestPostNumber < 1 ? 1 : topic.highestPostNumber;
+    return PostPage(
+      siteContext: siteContext,
+      topicId: '${topic.id}',
+      title: topic.title,
+      mode: PostsListMode.goto_page,
+      gotoPage: (last - 1) ~/ DiscourseNotificationRoute.postsPerPage + 1,
+      gotoPostNumber: last,
+      forumId: forumId,
+    );
+  }
+
+  void _open(BuildContext context) => Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => pageFor(siteContext, topic, forumId)));
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final title = withEmojiShortcodes(topic.title);
+    final at = topic.lastPostedAt;
+    final time = at == null ? '' : formatSmartDateTime(at.toLocal(), context);
+    // Its own button, not more words in the card's.
+    return Semantics(
+      container: true,
+      button: true,
+      label: AppLocalizations.of(context)!.categoryLatestTopic(title, time),
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: () => _open(context),
+        borderRadius: BorderRadius.circular(8),
+        child: ConstrainedBox(
+          // A finger's room, so a tap meant for it does not open the card.
+          constraints: const BoxConstraints(minHeight: 40),
+          child: Row(
+            children: [
+              Icon(Icons.chat_bubble_outline,
+                  size: 16, color: scheme.onSurfaceVariant),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.bodyMedium?.copyWith(color: scheme.onSurface),
+                ),
+              ),
+              if (time.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Text(time,
+                    style: text.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant)),
+              ],
+            ],
           ),
         ),
       ),

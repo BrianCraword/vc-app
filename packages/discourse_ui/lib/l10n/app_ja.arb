@@ -660,6 +660,7 @@
   "countMembers": "{count, plural, other{メンバー {formatted}}}",
   "countTopics": "{count, plural, other{トピック {formatted}}}",
   "categoryNewThisWeek": "今週の新着 {count}",
+  "categoryLatestTopic": "最新のトピック: {title}、{time}",
   "categoriesView": "カテゴリ",
   "allCategories": "すべてのカテゴリ",
   "allTags": "すべてのタグ",

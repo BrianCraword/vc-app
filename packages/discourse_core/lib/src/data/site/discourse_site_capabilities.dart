@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 import '../../util/html_text.dart';
 import '../../util/site_url.dart';
 import '../user/discourse_profile.dart';
+import 'discourse_category_latest_topic.dart';
 
 /// What `/site.json` says this forum offers.
 ///
@@ -85,6 +86,10 @@ class DiscourseSiteCapabilities {
   /// `/categories.json`), by category id. A category that response left out
   /// has no entry: "unknown", not zero.
   Map<int, int> topicsThisWeek = const {};
+
+  /// Each category's most recently posted in featured topic, by category
+  /// id, when `/categories.json` carried topics ([storeCategoryActivity]).
+  Map<int, DiscourseCategoryLatestTopic> latestTopics = const {};
 
   /// Whether the current user may tag topics (`can_tag_topics`). The
   /// composer offers tagging without this and lets the server refuse.
@@ -456,17 +461,25 @@ class DiscourseSiteCapabilities {
     caps.enableMentions = settings['enable_mentions'] != false;
   }
 
-  /// Records each category's topics of the past week from a
-  /// `/categories.json` list, subcategory lists included.
+  /// Records each category's topics of the past week, and its latest
+  /// topic when the list carries topics, from a `/categories.json` list,
+  /// subcategory lists included. [withTopics]: the list was asked for with
+  /// `include_topics`, so a category without topics has none any more.
   static void storeCategoryActivity(
-      String pluginUrl, Iterable<Map<String, dynamic>> categories) {
+      String pluginUrl, Iterable<Map<String, dynamic>> categories,
+      {bool withTopics = false}) {
     final caps = _bySite.putIfAbsent(
         pluginUrl, () => DiscourseSiteCapabilities._(pluginUrl));
     final week = Map<int, int>.of(caps.topicsThisWeek);
+    final latest = withTopics
+        ? <int, DiscourseCategoryLatestTopic>{}
+        : Map<int, DiscourseCategoryLatestTopic>.of(caps.latestTopics);
     void add(Map<String, dynamic> c) {
       final id = c['id'];
       final n = c['topics_week'];
       if (id is int && n is num) week[id] = n.toInt();
+      final topic = DiscourseCategoryLatestTopic.latestOf(c['topics']);
+      if (id is int && topic != null) latest[id] = topic;
       for (final sub in (c['subcategory_list'] as List?) ?? const []) {
         if (sub is Map) add(sub.cast<String, dynamic>());
       }
@@ -474,6 +487,7 @@ class DiscourseSiteCapabilities {
 
     categories.forEach(add);
     caps.topicsThisWeek = week;
+    caps.latestTopics = latest;
   }
 
   /// Records the forum's logos. Separate from [store] because they come
