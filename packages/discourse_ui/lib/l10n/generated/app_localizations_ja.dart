@@ -4682,4 +4682,20 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get postSignatureDescription => '作成したトピック、返信、メッセージの末尾に小さく表示されます';
+
+  @override
+  String get bookmarkTopic => 'トピックをブックマーク';
+
+  @override
+  String get deleteTopicBookmarks => 'すべてのブックマークを削除';
+
+  @override
+  String get deleteTopicBookmarksQuestion =>
+      'このトピックのブックマークをすべて削除しますか？リマインダーも削除されます。';
+
+  @override
+  String get topicBookmarked => 'トピックをブックマークしました';
+
+  @override
+  String get topicBookmarksDeleted => 'ブックマークを削除しました';
 }

@@ -4971,4 +4971,20 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get postSignatureDescription =>
       'Небольшая строка в конце ваших тем, ответов и сообщений';
+
+  @override
+  String get bookmarkTopic => 'Добавить тему в закладки';
+
+  @override
+  String get deleteTopicBookmarks => 'Удалить все закладки';
+
+  @override
+  String get deleteTopicBookmarksQuestion =>
+      'Удалить все ваши закладки в этой теме? Напоминания тоже будут удалены.';
+
+  @override
+  String get topicBookmarked => 'Тема добавлена в закладки';
+
+  @override
+  String get topicBookmarksDeleted => 'Закладки удалены';
 }

@@ -1458,5 +1458,10 @@
   "failedToLoadAudio": "No se pudo cargar el audio",
   "postingSettings": "Publicar",
   "postSignatureTitle": "Añadir «Sent from {appName}» a mis publicaciones",
-  "postSignatureDescription": "Una pequeña línea al final de los temas, respuestas y mensajes que escribes"
+  "postSignatureDescription": "Una pequeña línea al final de los temas, respuestas y mensajes que escribes",
+  "bookmarkTopic": "Guardar tema en marcadores",
+  "deleteTopicBookmarks": "Eliminar todos los marcadores",
+  "deleteTopicBookmarksQuestion": "¿Eliminar todos tus marcadores de este tema? También se eliminarán sus recordatorios.",
+  "topicBookmarked": "Tema guardado en marcadores",
+  "topicBookmarksDeleted": "Marcadores eliminados"
 }

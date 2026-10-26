@@ -4,6 +4,7 @@ import 'package:forumcopilot_sdk/models/entities/fc_bookmark.dart';
 import 'package:forumcopilot_sdk/models/results/fc_bookmark_result.dart';
 
 import '../data/post/discourse_bookmark_details.dart';
+import '../data/topic/discourse_topic_tracking.dart';
 import '../base_discourse_proxy.dart';
 import '../util/html_text.dart';
 import '../util/site_url.dart';
@@ -46,6 +47,52 @@ class DiscourseBookmarkProxy extends BaseDiscourseProxy
       return FCAddBookmarkResult(result: false, resultText: e.userMessage);
     } catch (e) {
       return FCAddBookmarkResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: bookmarks the topic itself (the web's "Bookmark
+  /// topic"), not one of its posts.
+  Future<FCAddBookmarkResult> addTopicBookmarkAsync(String topicId) async {
+    if (!siteContext.isLoggedIn) {
+      return FCAddBookmarkResult(result: false, resultText: 'Not signed in');
+    }
+    try {
+      final response = await apiPost('/bookmarks.json', body: {
+        'bookmarkable_type': 'Topic',
+        'bookmarkable_id': int.tryParse(topicId) ?? topicId,
+      });
+      DiscourseTopicTracking.forSite(siteContext).applyBookmarked(topicId, true);
+      return FCAddBookmarkResult(
+        result: true,
+        isBookmarked: true,
+        bookmarkId: (response['id'] as num?)?.toInt(),
+      );
+    } on DiscourseApiException catch (e) {
+      return FCAddBookmarkResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCAddBookmarkResult(result: false, resultText: describeApiError(e));
+    }
+  }
+
+  /// Discourse-only: deletes every bookmark the viewer has in the topic, the
+  /// topic's own and its posts', with their reminders (the web's "Delete
+  /// all bookmarks", PUT /t/{id}/remove_bookmarks →
+  /// BookmarkManager#destroy_for_topic).
+  Future<FCRemoveBookmarkResult> deleteTopicBookmarksAsync(
+      String topicId) async {
+    if (!siteContext.isLoggedIn) {
+      return FCRemoveBookmarkResult(result: false, resultText: 'Not signed in');
+    }
+    try {
+      await apiPut('/t/$topicId/remove_bookmarks.json');
+      DiscourseTopicTracking.forSite(siteContext)
+          .applyBookmarked(topicId, false);
+      return FCRemoveBookmarkResult(result: true, isBookmarked: false);
+    } on DiscourseApiException catch (e) {
+      return FCRemoveBookmarkResult(result: false, resultText: e.userMessage);
+    } catch (e) {
+      return FCRemoveBookmarkResult(
+          result: false, resultText: describeApiError(e));
     }
   }
 

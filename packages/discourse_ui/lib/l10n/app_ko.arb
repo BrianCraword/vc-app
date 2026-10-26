@@ -1458,5 +1458,10 @@
   "failedToLoadAudio": "오디오를 불러오지 못했습니다",
   "postingSettings": "게시",
   "postSignatureTitle": "내 게시물에 “Sent from {appName}” 추가",
-  "postSignatureDescription": "작성한 주제, 답글, 메시지 끝에 작은 글씨로 표시됩니다"
+  "postSignatureDescription": "작성한 주제, 답글, 메시지 끝에 작은 글씨로 표시됩니다",
+  "bookmarkTopic": "주제 북마크",
+  "deleteTopicBookmarks": "모든 북마크 삭제",
+  "deleteTopicBookmarksQuestion": "이 주제의 북마크를 모두 삭제할까요? 알림도 함께 삭제됩니다.",
+  "topicBookmarked": "주제를 북마크했습니다",
+  "topicBookmarksDeleted": "북마크를 삭제했습니다"
 }

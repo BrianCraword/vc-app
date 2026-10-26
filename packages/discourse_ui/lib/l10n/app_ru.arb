@@ -1458,5 +1458,10 @@
   "failedToLoadAudio": "Не удалось загрузить аудио",
   "postingSettings": "Публикация",
   "postSignatureTitle": "Добавлять «Sent from {appName}» к моим сообщениям",
-  "postSignatureDescription": "Небольшая строка в конце ваших тем, ответов и сообщений"
+  "postSignatureDescription": "Небольшая строка в конце ваших тем, ответов и сообщений",
+  "bookmarkTopic": "Добавить тему в закладки",
+  "deleteTopicBookmarks": "Удалить все закладки",
+  "deleteTopicBookmarksQuestion": "Удалить все ваши закладки в этой теме? Напоминания тоже будут удалены.",
+  "topicBookmarked": "Тема добавлена в закладки",
+  "topicBookmarksDeleted": "Закладки удалены"
 }

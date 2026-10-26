@@ -1458,5 +1458,10 @@
   "failedToLoadAudio": "Não foi possível carregar o áudio",
   "postingSettings": "Publicação",
   "postSignatureTitle": "Adicionar “Sent from {appName}” às minhas publicações",
-  "postSignatureDescription": "Uma pequena linha no fim dos tópicos, respostas e mensagens que você escreve"
+  "postSignatureDescription": "Uma pequena linha no fim dos tópicos, respostas e mensagens que você escreve",
+  "bookmarkTopic": "Adicionar tópico aos favoritos",
+  "deleteTopicBookmarks": "Excluir todos os favoritos",
+  "deleteTopicBookmarksQuestion": "Excluir todos os seus favoritos neste tópico? Os lembretes também serão excluídos.",
+  "topicBookmarked": "Tópico adicionado aos favoritos",
+  "topicBookmarksDeleted": "Favoritos excluídos"
 }

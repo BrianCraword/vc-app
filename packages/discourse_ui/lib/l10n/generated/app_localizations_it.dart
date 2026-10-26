@@ -4946,4 +4946,20 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get postSignatureDescription =>
       'Una piccola riga alla fine degli argomenti, delle risposte e dei messaggi che scrivi';
+
+  @override
+  String get bookmarkTopic => 'Aggiungi argomento ai segnalibri';
+
+  @override
+  String get deleteTopicBookmarks => 'Elimina tutti i segnalibri';
+
+  @override
+  String get deleteTopicBookmarksQuestion =>
+      'Eliminare tutti i tuoi segnalibri in questo argomento? Verranno eliminati anche i relativi promemoria.';
+
+  @override
+  String get topicBookmarked => 'Argomento aggiunto ai segnalibri';
+
+  @override
+  String get topicBookmarksDeleted => 'Segnalibri eliminati';
 }

@@ -1,5 +1,6 @@
 import 'package:discourse_core/discourse_core.dart' show DiscourseTopicTracking;
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart' show CustomSemanticsAction;
 import 'package:discourse_ui/l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_topic.dart';
@@ -10,6 +11,7 @@ import '../../theme/design_tokens.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../../theme/style_builders.dart';
 import '../../theme/forum_colors.dart';
+import '../widgets/topic_actions.dart';
 import '../widgets/topic_taxonomy_chips.dart';
 import '../widgets/unread_badge.dart';
 import '../../utils/topic_read_mark.dart';
@@ -54,14 +56,21 @@ class TopicListItem extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final excerpt = topic.shortContent ?? '';
 
+    // A signed-in reader can dismiss a new or unread topic from its row.
+    final canDismiss =
+        siteContext.isLoggedIn && (mark.isNew || mark.unreadCount > 0);
+
     // A Material 3 list item, title first: the author's avatar leading, the
     // title as the headline, then where the topic lives and what happened
     // last. It used to open with a three-line author block and put the
     // title under it, at ~200dp a row; this is ~90–115dp.
-    return Material(
+    final row = Material(
       color: colorScheme.surface,
       child: InkWell(
         onTap: onTap,
+        // What can be done without opening it ([TopicActions.showSheet]).
+        onLongPress: () => TopicActions.showSheet(context, siteContext, topic,
+            canDismiss: canDismiss),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -184,6 +193,61 @@ class TopicListItem extends StatelessWidget {
               indent: 72,
               color: colorScheme.outlineVariant,
             ),
+          ],
+        ),
+      ),
+    );
+    if (!canDismiss) return row;
+    // Swiped towards the start, a new or unread topic is dismissed, as
+    // Messages archives a message that way; the row stays, and its dot or
+    // count goes once the forum agrees. Towards the end is the edge's Back.
+    return Semantics(
+      customSemanticsActions: {
+        CustomSemanticsAction(label: l10n.dismiss): () =>
+            TopicActions.dismiss(context, siteContext, topic),
+      },
+      child: Dismissible(
+        key: ValueKey('dismiss-topic-${topic.id}'),
+        direction: DismissDirection.endToStart,
+        background: _DismissBackground(label: l10n.dismiss),
+        confirmDismiss: (_) async {
+          TopicActions.dismiss(context, siteContext, topic);
+          return false;
+        },
+        child: row,
+      ),
+    );
+  }
+}
+
+/// Behind a row being swiped: what letting go does.
+class _DismissBackground extends StatelessWidget {
+  const _DismissBackground({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return ColoredBox(
+      color: colorScheme.primaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingL),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context)
+                    .textTheme
+                    .labelLarge
+                    ?.copyWith(color: colorScheme.onPrimaryContainer),
+              ),
+            ),
+            const SizedBox(width: DesignTokens.spacingS),
+            Icon(Icons.done, color: colorScheme.onPrimaryContainer),
           ],
         ),
       ),

@@ -1458,5 +1458,10 @@
   "failedToLoadAudio": "无法加载音频",
   "postingSettings": "发帖",
   "postSignatureTitle": "在我的帖子末尾添加“Sent from {appName}”",
-  "postSignatureDescription": "在你发布的话题、回复和私信末尾显示一行小字"
+  "postSignatureDescription": "在你发布的话题、回复和私信末尾显示一行小字",
+  "bookmarkTopic": "为话题添加书签",
+  "deleteTopicBookmarks": "删除所有书签",
+  "deleteTopicBookmarksQuestion": "要删除你在此话题中的所有书签吗？其提醒也会一并删除。",
+  "topicBookmarked": "已为话题添加书签",
+  "topicBookmarksDeleted": "书签已删除"
 }

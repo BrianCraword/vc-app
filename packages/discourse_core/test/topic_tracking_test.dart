@@ -211,6 +211,23 @@ void main() {
       expect(tracking.stateOf('1')!.isNew, isFalse);
       expect(tracking.stateOf('2')!.isRead, isTrue);
     });
+
+    test('dismissing replies moves no place in a topic never opened', () {
+      // A row's swipe sends dismiss_posts and dismiss_topics for the same
+      // topic, and the forum announces both for all of them.
+      tracking.recordTopicJson(listTopic(1, unseen: true));
+      for (final type in ['dismiss_new_posts', 'dismiss_new']) {
+        tracking.applyBusMessage({
+          'message_type': type,
+          'payload': {
+            'topic_ids': [1],
+          },
+        });
+      }
+      expect(tracking.stateOf('1')!.isNew, isFalse);
+      expect(tracking.stateOf('1')!.isRead, isFalse,
+          reason: 'dismissed, not read: its title stays bold, as after a reload');
+    });
   });
 
   test('a different user starts empty', () {

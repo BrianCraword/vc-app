@@ -4616,4 +4616,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get postSignatureDescription => '在你发布的话题、回复和私信末尾显示一行小字';
+
+  @override
+  String get bookmarkTopic => '为话题添加书签';
+
+  @override
+  String get deleteTopicBookmarks => '删除所有书签';
+
+  @override
+  String get deleteTopicBookmarksQuestion => '要删除你在此话题中的所有书签吗？其提醒也会一并删除。';
+
+  @override
+  String get topicBookmarked => '已为话题添加书签';
+
+  @override
+  String get topicBookmarksDeleted => '书签已删除';
 }

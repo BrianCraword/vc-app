@@ -6209,5 +6209,25 @@
   "postSignatureDescription": "A small line at the end of the topics, replies and messages you write",
   "@postSignatureDescription": {
     "description": "Subtitle of the switch that adds the Sent from line"
+  },
+  "bookmarkTopic": "Bookmark topic",
+  "@bookmarkTopic": {
+    "description": "Topic row's long-press sheet: bookmark the topic itself (Discourse's 'Bookmark topic')"
+  },
+  "deleteTopicBookmarks": "Delete all bookmarks",
+  "@deleteTopicBookmarks": {
+    "description": "Topic row's long-press sheet, for a topic the reader has bookmarked: delete every bookmark they have in it (Discourse's 'Delete all bookmarks')"
+  },
+  "deleteTopicBookmarksQuestion": "Delete all your bookmarks in this topic? Their reminders go too.",
+  "@deleteTopicBookmarksQuestion": {
+    "description": "Asked before deleting all of the reader's bookmarks in a topic"
+  },
+  "topicBookmarked": "Topic bookmarked",
+  "@topicBookmarked": {
+    "description": "Shown after the reader bookmarked a topic from its row"
+  },
+  "topicBookmarksDeleted": "Bookmarks deleted",
+  "@topicBookmarksDeleted": {
+    "description": "Shown after the reader deleted all their bookmarks in a topic"
   }
 }

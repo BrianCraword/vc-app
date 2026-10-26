@@ -1458,5 +1458,10 @@
   "failedToLoadAudio": "Impossible de charger le fichier audio",
   "postingSettings": "Publication",
   "postSignatureTitle": "Ajouter « Sent from {appName} » à mes messages",
-  "postSignatureDescription": "Une petite ligne à la fin des sujets, réponses et messages que vous écrivez"
+  "postSignatureDescription": "Une petite ligne à la fin des sujets, réponses et messages que vous écrivez",
+  "bookmarkTopic": "Ajouter le sujet aux signets",
+  "deleteTopicBookmarks": "Supprimer tous les signets",
+  "deleteTopicBookmarksQuestion": "Supprimer tous vos signets de ce sujet ? Leurs rappels seront aussi supprimés.",
+  "topicBookmarked": "Sujet ajouté aux signets",
+  "topicBookmarksDeleted": "Signets supprimés"
 }

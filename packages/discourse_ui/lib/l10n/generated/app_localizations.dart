@@ -7961,6 +7961,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A small line at the end of the topics, replies and messages you write'**
   String get postSignatureDescription;
+
+  /// Topic row's long-press sheet: bookmark the topic itself (Discourse's 'Bookmark topic')
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark topic'**
+  String get bookmarkTopic;
+
+  /// Topic row's long-press sheet, for a topic the reader has bookmarked: delete every bookmark they have in it (Discourse's 'Delete all bookmarks')
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all bookmarks'**
+  String get deleteTopicBookmarks;
+
+  /// Asked before deleting all of the reader's bookmarks in a topic
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all your bookmarks in this topic? Their reminders go too.'**
+  String get deleteTopicBookmarksQuestion;
+
+  /// Shown after the reader bookmarked a topic from its row
+  ///
+  /// In en, this message translates to:
+  /// **'Topic bookmarked'**
+  String get topicBookmarked;
+
+  /// Shown after the reader deleted all their bookmarks in a topic
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks deleted'**
+  String get topicBookmarksDeleted;
 }
 
 class _AppLocalizationsDelegate

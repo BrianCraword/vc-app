@@ -222,6 +222,9 @@ class DiscourseSubscriptionProxy extends BaseDiscourseProxy
       await apiPost('/t/$topicId/notifications.json', body: {
         'notification_level': level.level,
       });
+      // A row's long-press sheet and unread count read it from here.
+      DiscourseTopicTracking.forSite(siteContext)
+          .applyNotificationLevel(topicId, level.level);
       // The topic page's footer reads the level and its reason from here;
       // a level set by hand has the reason "user_changed" (2).
       final status =

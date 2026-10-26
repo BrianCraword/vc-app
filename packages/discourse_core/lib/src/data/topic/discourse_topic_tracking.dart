@@ -30,6 +30,7 @@ class DiscourseTopicReadState {
     this.dismissed = false,
     this.categoryId,
     this.isPrivateMessage = false,
+    this.bookmarked,
   });
 
   final String topicId;
@@ -58,6 +59,11 @@ class DiscourseTopicReadState {
   /// rule (DiscoursePrivateConversationProxy._isUnreadOrNew).
   final bool isPrivateMessage;
 
+  /// Whether the viewer has bookmarked the topic or a post in it (the
+  /// `bookmarked` of their topic_users row, which lists carry); null when no
+  /// payload has said.
+  final bool? bookmarked;
+
   /// Discourse's `visited`: read to the end.
   bool get isRead {
     final lastRead = lastReadPostNumber;
@@ -84,6 +90,7 @@ class DiscourseTopicReadState {
     bool? dismissed,
     int? categoryId,
     bool? isPrivateMessage,
+    bool? bookmarked,
   }) =>
       DiscourseTopicReadState(
         topicId: topicId,
@@ -94,6 +101,7 @@ class DiscourseTopicReadState {
         dismissed: dismissed ?? this.dismissed,
         categoryId: categoryId ?? this.categoryId,
         isPrivateMessage: isPrivateMessage ?? this.isPrivateMessage,
+        bookmarked: bookmarked ?? this.bookmarked,
       );
 }
 
@@ -217,6 +225,7 @@ class DiscourseTopicTracking extends ChangeNotifier {
       unseen: t.containsKey('unseen') ? t['unseen'] == true : null,
       categoryId: _int(t['category_id']),
       isPrivateMessage: t['archetype'] == 'private_message',
+      bookmarked: t.containsKey('bookmarked') ? t['bookmarked'] == true : null,
     );
     _changed();
   }
@@ -284,14 +293,35 @@ class DiscourseTopicTracking extends ChangeNotifier {
   }
 
   /// Topics whose new replies were dismissed (`dismiss_posts`): read up to
-  /// their newest post.
+  /// their newest post. Only where the reader has a place to move, as the
+  /// server's update touches only their topic_users rows: a topic never
+  /// opened was dismissed, not read, and its title stays as it was. (The
+  /// web's tracking state moves it anyway, but its rows are styled from
+  /// the topic list, which keeps it.)
   void applyDismissedUnread(Iterable<String> topicIds) {
     for (final id in topicIds) {
       final s = _states[id];
-      if (s != null) {
+      if (s != null && s.lastReadPostNumber != null) {
         _states[id] = s.copyWith(lastReadPostNumber: s.highestPostNumber);
       }
     }
+    _changed();
+  }
+
+  /// The viewer set [topicId]'s notification level (0 muted … 3 watching):
+  /// a topic below Tracking no longer counts as unread.
+  void applyNotificationLevel(String topicId, int level) {
+    final s = _states[topicId];
+    if (s == null) return;
+    _states[topicId] = s.copyWith(notificationLevel: level);
+    _changed();
+  }
+
+  /// The viewer bookmarked [topicId], or deleted its bookmarks.
+  void applyBookmarked(String topicId, bool bookmarked) {
+    final s = _states[topicId];
+    if (s == null) return;
+    _states[topicId] = s.copyWith(bookmarked: bookmarked);
     _changed();
   }
 
@@ -363,6 +393,7 @@ class DiscourseTopicTracking extends ChangeNotifier {
     required bool? unseen,
     int? categoryId,
     bool? isPrivateMessage,
+    bool? bookmarked,
   }) {
     final s = _states[id];
     if (s == null) {
@@ -374,6 +405,7 @@ class DiscourseTopicTracking extends ChangeNotifier {
         unseen: unseen ?? false,
         categoryId: categoryId,
         isPrivateMessage: isPrivateMessage ?? false,
+        bookmarked: bookmarked,
       );
       return;
     }
@@ -391,6 +423,7 @@ class DiscourseTopicTracking extends ChangeNotifier {
       dismissed: s.dismissed,
       categoryId: categoryId ?? s.categoryId,
       isPrivateMessage: isPrivateMessage ?? s.isPrivateMessage,
+      bookmarked: bookmarked ?? s.bookmarked,
     );
   }
 

@@ -1458,5 +1458,10 @@
   "failedToLoadAudio": "Impossibile caricare l’audio",
   "postingSettings": "Pubblicazione",
   "postSignatureTitle": "Aggiungi “Sent from {appName}” ai miei post",
-  "postSignatureDescription": "Una piccola riga alla fine degli argomenti, delle risposte e dei messaggi che scrivi"
+  "postSignatureDescription": "Una piccola riga alla fine degli argomenti, delle risposte e dei messaggi che scrivi",
+  "bookmarkTopic": "Aggiungi argomento ai segnalibri",
+  "deleteTopicBookmarks": "Elimina tutti i segnalibri",
+  "deleteTopicBookmarksQuestion": "Eliminare tutti i tuoi segnalibri in questo argomento? Verranno eliminati anche i relativi promemoria.",
+  "topicBookmarked": "Argomento aggiunto ai segnalibri",
+  "topicBookmarksDeleted": "Segnalibri eliminati"
 }

@@ -4872,4 +4872,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get postSignatureDescription =>
       'A small line at the end of the topics, replies and messages you write';
+
+  @override
+  String get bookmarkTopic => 'Bookmark topic';
+
+  @override
+  String get deleteTopicBookmarks => 'Delete all bookmarks';
+
+  @override
+  String get deleteTopicBookmarksQuestion =>
+      'Delete all your bookmarks in this topic? Their reminders go too.';
+
+  @override
+  String get topicBookmarked => 'Topic bookmarked';
+
+  @override
+  String get topicBookmarksDeleted => 'Bookmarks deleted';
 }

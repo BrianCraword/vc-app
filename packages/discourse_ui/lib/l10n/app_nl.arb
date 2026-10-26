@@ -1587,5 +1587,10 @@
   "failedToLoadAudio": "Audio laden mislukt",
   "postingSettings": "Berichten plaatsen",
   "postSignatureTitle": "‘Sent from {appName}’ onder mijn berichten zetten",
-  "postSignatureDescription": "Een kleine regel onder de topics, antwoorden en berichten die je schrijft"
+  "postSignatureDescription": "Een kleine regel onder de topics, antwoorden en berichten die je schrijft",
+  "bookmarkTopic": "Topic als bladwijzer opslaan",
+  "deleteTopicBookmarks": "Alle bladwijzers verwijderen",
+  "deleteTopicBookmarksQuestion": "Al je bladwijzers in dit topic verwijderen? Hun herinneringen worden ook verwijderd.",
+  "topicBookmarked": "Topic als bladwijzer opgeslagen",
+  "topicBookmarksDeleted": "Bladwijzers verwijderd"
 }

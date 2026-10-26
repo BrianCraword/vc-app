@@ -288,11 +288,12 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
   @override
   Future<FCMarkTopicReadResult> markTopicReadAsync(
       List<String> topicIds) async {
-    // PUT /topics/bulk requires `topic_ids` (or filter=='unread') and an
-    // operation type from TopicsBulkAction.operations — 'dismiss' is not
-    // one (topics_controller#bulk / lib/topics_bulk_action.rb). Marking a
-    // topic read == 'dismiss_posts' (sets last_read_post_number to the
-    // topic's highest post, which also clears its "new" state).
+    // The web's Dismiss for chosen topics, which takes two of
+    // TopicsBulkAction's operations (PUT /topics/bulk with `topic_ids`):
+    // 'dismiss_posts' moves the reader's place to the newest post, but only
+    // in topics they have a topic_users row for, so a topic never opened
+    // stayed new; 'dismiss_topics' is what dismisses those (it touches only
+    // topics never read). Each is a no-op for the others, so both are sent.
     final ids = topicIds
         .map(int.tryParse)
         .whereType<int>()
@@ -301,11 +302,21 @@ class DiscourseTopicProxy extends BaseDiscourseProxy implements IFCTopicProxy {
       return FCMarkTopicReadResult(result: true, resultText: '');
     }
     try {
+      final tracking = DiscourseTopicTracking.forSite(siteContext);
+      final names = [for (final id in ids) '$id'];
       await apiPut('/topics/bulk', body: {
         'topic_ids': ids,
         'operation': {'type': 'dismiss_posts'},
       });
+      tracking.applyDismissedUnread(names);
+      await apiPut('/topics/bulk', body: {
+        'topic_ids': ids,
+        'operation': {'type': 'dismiss_topics'},
+      });
+      tracking.applyDismissedNew(names);
       return FCMarkTopicReadResult(result: true, resultText: '');
+    } on DiscourseApiException catch (e) {
+      return FCMarkTopicReadResult(result: false, resultText: e.userMessage);
     } catch (e) {
       return FCMarkTopicReadResult(result: false, resultText: describeApiError(e));
     }

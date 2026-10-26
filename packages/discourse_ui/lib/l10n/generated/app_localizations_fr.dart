@@ -4952,4 +4952,20 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get postSignatureDescription =>
       'Une petite ligne à la fin des sujets, réponses et messages que vous écrivez';
+
+  @override
+  String get bookmarkTopic => 'Ajouter le sujet aux signets';
+
+  @override
+  String get deleteTopicBookmarks => 'Supprimer tous les signets';
+
+  @override
+  String get deleteTopicBookmarksQuestion =>
+      'Supprimer tous vos signets de ce sujet ? Leurs rappels seront aussi supprimés.';
+
+  @override
+  String get topicBookmarked => 'Sujet ajouté aux signets';
+
+  @override
+  String get topicBookmarksDeleted => 'Signets supprimés';
 }

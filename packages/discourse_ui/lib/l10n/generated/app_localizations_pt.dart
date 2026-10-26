@@ -4935,4 +4935,20 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get postSignatureDescription =>
       'Uma pequena linha no fim dos tópicos, respostas e mensagens que você escreve';
+
+  @override
+  String get bookmarkTopic => 'Adicionar tópico aos favoritos';
+
+  @override
+  String get deleteTopicBookmarks => 'Excluir todos os favoritos';
+
+  @override
+  String get deleteTopicBookmarksQuestion =>
+      'Excluir todos os seus favoritos neste tópico? Os lembretes também serão excluídos.';
+
+  @override
+  String get topicBookmarked => 'Tópico adicionado aos favoritos';
+
+  @override
+  String get topicBookmarksDeleted => 'Favoritos excluídos';
 }

@@ -4964,4 +4964,20 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get postSignatureDescription =>
       'Eine kleine Zeile am Ende deiner Themen, Antworten und Nachrichten';
+
+  @override
+  String get bookmarkTopic => 'Thema als Lesezeichen speichern';
+
+  @override
+  String get deleteTopicBookmarks => 'Alle Lesezeichen löschen';
+
+  @override
+  String get deleteTopicBookmarksQuestion =>
+      'Alle deine Lesezeichen in diesem Thema löschen? Ihre Erinnerungen werden ebenfalls gelöscht.';
+
+  @override
+  String get topicBookmarked => 'Thema als Lesezeichen gespeichert';
+
+  @override
+  String get topicBookmarksDeleted => 'Lesezeichen gelöscht';
 }

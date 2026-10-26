@@ -1458,5 +1458,10 @@
   "failedToLoadAudio": "音声を読み込めませんでした",
   "postingSettings": "投稿",
   "postSignatureTitle": "投稿に「Sent from {appName}」を追加",
-  "postSignatureDescription": "作成したトピック、返信、メッセージの末尾に小さく表示されます"
+  "postSignatureDescription": "作成したトピック、返信、メッセージの末尾に小さく表示されます",
+  "bookmarkTopic": "トピックをブックマーク",
+  "deleteTopicBookmarks": "すべてのブックマークを削除",
+  "deleteTopicBookmarksQuestion": "このトピックのブックマークをすべて削除しますか？リマインダーも削除されます。",
+  "topicBookmarked": "トピックをブックマークしました",
+  "topicBookmarksDeleted": "ブックマークを削除しました"
 }

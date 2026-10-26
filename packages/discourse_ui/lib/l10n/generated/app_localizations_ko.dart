@@ -4681,4 +4681,20 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get postSignatureDescription => '작성한 주제, 답글, 메시지 끝에 작은 글씨로 표시됩니다';
+
+  @override
+  String get bookmarkTopic => '주제 북마크';
+
+  @override
+  String get deleteTopicBookmarks => '모든 북마크 삭제';
+
+  @override
+  String get deleteTopicBookmarksQuestion =>
+      '이 주제의 북마크를 모두 삭제할까요? 알림도 함께 삭제됩니다.';
+
+  @override
+  String get topicBookmarked => '주제를 북마크했습니다';
+
+  @override
+  String get topicBookmarksDeleted => '북마크를 삭제했습니다';
 }

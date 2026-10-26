@@ -4936,4 +4936,20 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get postSignatureDescription =>
       'Una pequeña línea al final de los temas, respuestas y mensajes que escribes';
+
+  @override
+  String get bookmarkTopic => 'Guardar tema en marcadores';
+
+  @override
+  String get deleteTopicBookmarks => 'Eliminar todos los marcadores';
+
+  @override
+  String get deleteTopicBookmarksQuestion =>
+      '¿Eliminar todos tus marcadores de este tema? También se eliminarán sus recordatorios.';
+
+  @override
+  String get topicBookmarked => 'Tema guardado en marcadores';
+
+  @override
+  String get topicBookmarksDeleted => 'Marcadores eliminados';
 }

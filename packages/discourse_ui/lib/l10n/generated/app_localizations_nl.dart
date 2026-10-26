@@ -4918,4 +4918,20 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get postSignatureDescription =>
       'Een kleine regel onder de topics, antwoorden en berichten die je schrijft';
+
+  @override
+  String get bookmarkTopic => 'Topic als bladwijzer opslaan';
+
+  @override
+  String get deleteTopicBookmarks => 'Alle bladwijzers verwijderen';
+
+  @override
+  String get deleteTopicBookmarksQuestion =>
+      'Al je bladwijzers in dit topic verwijderen? Hun herinneringen worden ook verwijderd.';
+
+  @override
+  String get topicBookmarked => 'Topic als bladwijzer opgeslagen';
+
+  @override
+  String get topicBookmarksDeleted => 'Bladwijzers verwijderd';
 }
