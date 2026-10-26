@@ -4697,4 +4697,127 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get topicBookmarksDeleted => '북마크를 삭제했습니다';
+
+  @override
+  String get pollBuild => '투표 만들기';
+
+  @override
+  String get pollEdit => '투표 편집';
+
+  @override
+  String get pollInsert => '삽입';
+
+  @override
+  String get pollTypeRegular => '단일 선택';
+
+  @override
+  String get pollTypeMultiple => '복수 선택';
+
+  @override
+  String get pollTypeNumber => '숫자 평가';
+
+  @override
+  String get pollTitleOptional => '제목(선택 사항)';
+
+  @override
+  String pollOptionLabel(int number) {
+    return '옵션 $number';
+  }
+
+  @override
+  String get pollRemoveOption => '옵션 삭제';
+
+  @override
+  String get pollAddOption => '옵션 추가';
+
+  @override
+  String get pollMinChoices => '최소 선택 수';
+
+  @override
+  String get pollMaxChoices => '최대 선택 수';
+
+  @override
+  String get pollNumberMin => '최소';
+
+  @override
+  String get pollNumberMax => '최대';
+
+  @override
+  String get pollNumberStep => '간격';
+
+  @override
+  String get pollResultsLabel => '결과 표시';
+
+  @override
+  String get pollResultsAlways => '항상';
+
+  @override
+  String get pollResultsOnVote => '투표 후';
+
+  @override
+  String get pollResultsOnClose => '투표가 끝나면';
+
+  @override
+  String get pollResultsStaffOnly => '운영진에게만';
+
+  @override
+  String get pollShowWhoVoted => '투표자 표시';
+
+  @override
+  String get pollCloseAutomatically => '자동 종료';
+
+  @override
+  String get pollNeverCloses => '안 함';
+
+  @override
+  String get pollDontClose => '자동 종료 안 함';
+
+  @override
+  String get pollChart => '차트';
+
+  @override
+  String get pollChartBar => '막대';
+
+  @override
+  String get pollChartPie => '원형';
+
+  @override
+  String get pollEnterNumber => '숫자를 입력하세요';
+
+  @override
+  String get pollStepTooSmall => '1 이상이어야 합니다';
+
+  @override
+  String get pollNumberTooFew => '선택할 수 있는 숫자가 2개 미만입니다';
+
+  @override
+  String pollNumberTooMany(int count) {
+    return '선택할 숫자가 $count개를 넘습니다';
+  }
+
+  @override
+  String get pollNeedsOption => '옵션을 하나 이상 추가하세요';
+
+  @override
+  String get pollOptionsMustDiffer => '옵션은 모두 달라야 합니다';
+
+  @override
+  String pollTooManyOptions(int count) {
+    return '옵션은 최대 $count개입니다';
+  }
+
+  @override
+  String get pollMultipleNeedsTwo => '복수 선택에는 옵션이 2개 이상 필요합니다';
+
+  @override
+  String get pollCloseInPast => '미래의 시간을 선택하세요';
+
+  @override
+  String get pollFewer => '줄이기';
+
+  @override
+  String get pollMore => '늘리기';
+
+  @override
+  String get pollRemove => '투표 삭제';
 }

@@ -4987,4 +4987,128 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get topicBookmarksDeleted => 'Закладки удалены';
+
+  @override
+  String get pollBuild => 'Создать опрос';
+
+  @override
+  String get pollEdit => 'Изменить опрос';
+
+  @override
+  String get pollInsert => 'Вставить';
+
+  @override
+  String get pollTypeRegular => 'Один вариант';
+
+  @override
+  String get pollTypeMultiple => 'Несколько вариантов';
+
+  @override
+  String get pollTypeNumber => 'Числовая оценка';
+
+  @override
+  String get pollTitleOptional => 'Заголовок (необязательно)';
+
+  @override
+  String pollOptionLabel(int number) {
+    return 'Вариант $number';
+  }
+
+  @override
+  String get pollRemoveOption => 'Удалить вариант';
+
+  @override
+  String get pollAddOption => 'Добавить вариант';
+
+  @override
+  String get pollMinChoices => 'Минимум вариантов';
+
+  @override
+  String get pollMaxChoices => 'Максимум вариантов';
+
+  @override
+  String get pollNumberMin => 'Минимум';
+
+  @override
+  String get pollNumberMax => 'Максимум';
+
+  @override
+  String get pollNumberStep => 'Шаг';
+
+  @override
+  String get pollResultsLabel => 'Показывать результаты';
+
+  @override
+  String get pollResultsAlways => 'Всегда';
+
+  @override
+  String get pollResultsOnVote => 'После голосования';
+
+  @override
+  String get pollResultsOnClose => 'Когда опрос закроется';
+
+  @override
+  String get pollResultsStaffOnly => 'Только персоналу';
+
+  @override
+  String get pollShowWhoVoted => 'Показывать, кто голосовал';
+
+  @override
+  String get pollCloseAutomatically => 'Закрыть автоматически';
+
+  @override
+  String get pollNeverCloses => 'Никогда';
+
+  @override
+  String get pollDontClose => 'Не закрывать автоматически';
+
+  @override
+  String get pollChart => 'Диаграмма';
+
+  @override
+  String get pollChartBar => 'Столбцы';
+
+  @override
+  String get pollChartPie => 'Круговая';
+
+  @override
+  String get pollEnterNumber => 'Введите число';
+
+  @override
+  String get pollStepTooSmall => 'Не меньше 1';
+
+  @override
+  String get pollNumberTooFew => 'Остаётся меньше двух чисел на выбор';
+
+  @override
+  String pollNumberTooMany(int count) {
+    return 'Получается больше $count чисел на выбор';
+  }
+
+  @override
+  String get pollNeedsOption => 'Добавьте хотя бы один вариант';
+
+  @override
+  String get pollOptionsMustDiffer => 'Варианты не должны повторяться';
+
+  @override
+  String pollTooManyOptions(int count) {
+    return 'Не больше $count вариантов';
+  }
+
+  @override
+  String get pollMultipleNeedsTwo =>
+      'Для выбора нескольких вариантов нужно хотя бы два';
+
+  @override
+  String get pollCloseInPast => 'Выберите время в будущем';
+
+  @override
+  String get pollFewer => 'Меньше';
+
+  @override
+  String get pollMore => 'Больше';
+
+  @override
+  String get pollRemove => 'Удалить опрос';
 }

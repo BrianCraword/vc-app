@@ -4698,4 +4698,127 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get topicBookmarksDeleted => 'ブックマークを削除しました';
+
+  @override
+  String get pollBuild => '投票を作成';
+
+  @override
+  String get pollEdit => '投票を編集';
+
+  @override
+  String get pollInsert => '挿入';
+
+  @override
+  String get pollTypeRegular => '単一選択';
+
+  @override
+  String get pollTypeMultiple => '複数選択';
+
+  @override
+  String get pollTypeNumber => '数値評価';
+
+  @override
+  String get pollTitleOptional => 'タイトル（任意）';
+
+  @override
+  String pollOptionLabel(int number) {
+    return '選択肢 $number';
+  }
+
+  @override
+  String get pollRemoveOption => '選択肢を削除';
+
+  @override
+  String get pollAddOption => '選択肢を追加';
+
+  @override
+  String get pollMinChoices => '最小選択数';
+
+  @override
+  String get pollMaxChoices => '最大選択数';
+
+  @override
+  String get pollNumberMin => '最小';
+
+  @override
+  String get pollNumberMax => '最大';
+
+  @override
+  String get pollNumberStep => '間隔';
+
+  @override
+  String get pollResultsLabel => '結果の表示';
+
+  @override
+  String get pollResultsAlways => '常に';
+
+  @override
+  String get pollResultsOnVote => '投票後';
+
+  @override
+  String get pollResultsOnClose => '投票の終了時';
+
+  @override
+  String get pollResultsStaffOnly => 'スタッフのみ';
+
+  @override
+  String get pollShowWhoVoted => '投票者を表示';
+
+  @override
+  String get pollCloseAutomatically => '自動で終了';
+
+  @override
+  String get pollNeverCloses => 'しない';
+
+  @override
+  String get pollDontClose => '自動で終了しない';
+
+  @override
+  String get pollChart => 'グラフ';
+
+  @override
+  String get pollChartBar => '棒グラフ';
+
+  @override
+  String get pollChartPie => '円グラフ';
+
+  @override
+  String get pollEnterNumber => '数値を入力してください';
+
+  @override
+  String get pollStepTooSmall => '1以上にしてください';
+
+  @override
+  String get pollNumberTooFew => '選べる数値が2つ未満になります';
+
+  @override
+  String pollNumberTooMany(int count) {
+    return '選べる数値が$count個を超えます';
+  }
+
+  @override
+  String get pollNeedsOption => '選択肢を1つ以上追加してください';
+
+  @override
+  String get pollOptionsMustDiffer => '選択肢はすべて異なる必要があります';
+
+  @override
+  String pollTooManyOptions(int count) {
+    return '選択肢は最大$count個です';
+  }
+
+  @override
+  String get pollMultipleNeedsTwo => '複数選択には選択肢が2つ以上必要です';
+
+  @override
+  String get pollCloseInPast => '未来の日時を選んでください';
+
+  @override
+  String get pollFewer => '減らす';
+
+  @override
+  String get pollMore => '増やす';
+
+  @override
+  String get pollRemove => '投票を削除';
 }

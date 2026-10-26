@@ -4952,4 +4952,128 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get topicBookmarksDeleted => 'Marcadores eliminados';
+
+  @override
+  String get pollBuild => 'Crear encuesta';
+
+  @override
+  String get pollEdit => 'Editar encuesta';
+
+  @override
+  String get pollInsert => 'Insertar';
+
+  @override
+  String get pollTypeRegular => 'Opción única';
+
+  @override
+  String get pollTypeMultiple => 'Opción múltiple';
+
+  @override
+  String get pollTypeNumber => 'Valoración numérica';
+
+  @override
+  String get pollTitleOptional => 'Título (opcional)';
+
+  @override
+  String pollOptionLabel(int number) {
+    return 'Opción $number';
+  }
+
+  @override
+  String get pollRemoveOption => 'Quitar opción';
+
+  @override
+  String get pollAddOption => 'Añadir opción';
+
+  @override
+  String get pollMinChoices => 'Mínimo de opciones';
+
+  @override
+  String get pollMaxChoices => 'Máximo de opciones';
+
+  @override
+  String get pollNumberMin => 'Mínimo';
+
+  @override
+  String get pollNumberMax => 'Máximo';
+
+  @override
+  String get pollNumberStep => 'Incremento';
+
+  @override
+  String get pollResultsLabel => 'Mostrar resultados';
+
+  @override
+  String get pollResultsAlways => 'Siempre';
+
+  @override
+  String get pollResultsOnVote => 'Después de votar';
+
+  @override
+  String get pollResultsOnClose => 'Cuando se cierre la encuesta';
+
+  @override
+  String get pollResultsStaffOnly => 'Solo al personal';
+
+  @override
+  String get pollShowWhoVoted => 'Mostrar quién votó';
+
+  @override
+  String get pollCloseAutomatically => 'Cerrar automáticamente';
+
+  @override
+  String get pollNeverCloses => 'Nunca';
+
+  @override
+  String get pollDontClose => 'No cerrar automáticamente';
+
+  @override
+  String get pollChart => 'Gráfico';
+
+  @override
+  String get pollChartBar => 'Barras';
+
+  @override
+  String get pollChartPie => 'Circular';
+
+  @override
+  String get pollEnterNumber => 'Escribe un número';
+
+  @override
+  String get pollStepTooSmall => 'Al menos 1';
+
+  @override
+  String get pollNumberTooFew => 'Deja menos de dos números para elegir';
+
+  @override
+  String pollNumberTooMany(int count) {
+    return 'Da más de $count números para elegir';
+  }
+
+  @override
+  String get pollNeedsOption => 'Añade al menos una opción';
+
+  @override
+  String get pollOptionsMustDiffer => 'Cada opción debe ser distinta';
+
+  @override
+  String pollTooManyOptions(int count) {
+    return 'Como máximo $count opciones';
+  }
+
+  @override
+  String get pollMultipleNeedsTwo =>
+      'La opción múltiple necesita al menos dos opciones';
+
+  @override
+  String get pollCloseInPast => 'Elige una hora futura';
+
+  @override
+  String get pollFewer => 'Menos';
+
+  @override
+  String get pollMore => 'Más';
+
+  @override
+  String get pollRemove => 'Quitar encuesta';
 }

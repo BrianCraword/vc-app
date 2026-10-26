@@ -9,6 +9,7 @@ import 'package:discourse_core/discourse_core.dart'
         discourseUploadKind,
         discourseUploadMarkdown;
 import '../../utils/discourse_markup.dart';
+import '../../utils/discourse_poll_markup.dart';
 import '../../utils/emoji_shortcodes.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
@@ -27,6 +28,7 @@ import '../../utils/image_optimize.dart';
 import '../../utils/image_shrink.dart';
 import '../../utils/mention_suggester.dart';
 import 'oversized_image_sheet.dart';
+import 'poll_builder_page.dart';
 import 'package:forumcopilot_sdk/models/entities/fc_attachment_data.dart';
 import 'category_badge.dart';
 import 'upload_tile.dart';
@@ -241,6 +243,44 @@ class _MessageComposePageState extends State<MessageComposePage> {
     people: widget.mentionPeople,
     selfUsername: widget.siteContext.loginDataOutput?.user?.username,
   );
+
+  /// Whether the toolbar offers the poll builder: the forum runs the poll
+  /// plugin and lets the reader create polls (staff, or in
+  /// poll_create_allowed_groups), as the web's builder is offered.
+  bool get _canBuildPoll {
+    final caps =
+        DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl);
+    return widget.siteContext.isLoggedIn &&
+        caps.pollEnabled &&
+        caps.canCreatePoll;
+  }
+
+  /// Builds a poll and puts its block in the text, on a line of its own at
+  /// the cursor, as the web's builder does. A post's second poll needs a
+  /// name of its own.
+  Future<void> _buildPoll() async {
+    final caps =
+        DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl);
+    final poll = await PollBuilderPage.open(context,
+        maxOptions: caps.pollMaximumOptions,
+        defaultPublic: caps.pollDefaultPublic);
+    if (poll == null || !mounted) return;
+    _insertOnOwnLine(poll
+        .copyWith(name: DiscoursePoll.nameForAnother(_contentController.text))
+        .toMarkup());
+    _contentFocusNode.requestFocus();
+  }
+
+  /// Opens a poll that is already in the text in the builder, and puts the
+  /// changed one in its place.
+  Future<void> _editPoll(String block, DiscoursePoll poll) async {
+    final caps =
+        DiscourseSiteCapabilities.forSite(widget.siteContext.site.pluginUrl);
+    final changed = await PollBuilderPage.open(context,
+        maxOptions: caps.pollMaximumOptions, poll: poll);
+    if (changed == null || !mounted) return;
+    _replaceInText(block, changed.toMarkup());
+  }
 
   void _followMention() {
     if (_canMention) _mentions.update(_contentController.value);
@@ -1216,6 +1256,54 @@ class _MessageComposePageState extends State<MessageComposePage> {
     );
   }
 
+  /// The polls in the text, each a chip that opens it in the builder or
+  /// takes it out. The text is what is posted; these are handles on it.
+  Widget _buildPollStrip() => ListenableBuilder(
+        listenable: _contentController,
+        builder: (context, _) {
+          if (!_canBuildPoll) return const SizedBox.shrink();
+          final text = _contentController.text;
+          final polls = DiscoursePoll.findIn(text);
+          if (polls.isEmpty) return const SizedBox.shrink();
+          final l10n = AppLocalizations.of(context)!;
+          return SizedBox(
+            height: 48,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(
+                horizontal: DesignTokens.spacingL,
+                vertical: DesignTokens.spacingXS,
+              ),
+              itemCount: polls.length,
+              separatorBuilder: (_, __) =>
+                  const SizedBox(width: DesignTokens.spacingS),
+              itemBuilder: (context, i) {
+                final found = polls[i];
+                final block = text.substring(found.start, found.end);
+                final title = found.poll.title;
+                return InputChip(
+                  avatar: const Icon(Icons.poll_outlined),
+                  label: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    child: Text(title.isEmpty ? l10n.poll : title,
+                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ),
+                  tooltip: found.poll.isEditable ? l10n.pollEdit : null,
+                  // A kind the builder does not make (ranked choice) can
+                  // only be taken out.
+                  onPressed: found.poll.isEditable && !_isSubmitting
+                      ? () => _editPoll(block, found.poll)
+                      : null,
+                  onDeleted:
+                      _isSubmitting ? null : () => _replaceInText(block, ''),
+                  deleteButtonTooltipMessage: l10n.pollRemove,
+                );
+              },
+            ),
+          );
+        },
+      );
+
   /// Who the `@name` being typed could be, a tap away, above the toolbar
   /// while the text is being written. The @ button still searches.
   Widget _buildMentionStrip() => ListenableBuilder(
@@ -1274,236 +1362,249 @@ class _MessageComposePageState extends State<MessageComposePage> {
         top: false,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: DesignTokens.spacingS, vertical: DesignTokens.spacingXS),
-          child: Row(
-            children: [
-              // File attachment button - only show if onFileUpload is provided
-              if (widget.onFileUpload != null)
-                Semantics(
-                  label: AppLocalizations.of(context)!.attachFile,
-                  hint: AppLocalizations.of(context)!.composerAttachFileHint,
-                  button: true,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.attach_file,
-                      color: colorScheme.onSurfaceVariant,
+          // Scrolls on a narrow phone rather than push the last buttons off.
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                // File attachment button - only show if onFileUpload is provided
+                if (widget.onFileUpload != null)
+                  Semantics(
+                    label: AppLocalizations.of(context)!.attachFile,
+                    hint: AppLocalizations.of(context)!.composerAttachFileHint,
+                    button: true,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.attach_file,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      tooltip: AppLocalizations.of(context)!.attachFile,
+                      onPressed: _handleFileUpload,
                     ),
-                    tooltip: AppLocalizations.of(context)!.attachFile,
-                    onPressed: _handleFileUpload,
                   ),
-                ),
-              // Image upload button - only show if onFileUpload is provided
-              if (widget.onFileUpload != null)
-                Semantics(
-                  label: AppLocalizations.of(context)!.uploadImage,
-                  hint: AppLocalizations.of(context)!.composerUploadImageHint,
-                  button: true,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.image,
-                      color: colorScheme.onSurfaceVariant,
+                // Image upload button - only show if onFileUpload is provided
+                if (widget.onFileUpload != null)
+                  Semantics(
+                    label: AppLocalizations.of(context)!.uploadImage,
+                    hint: AppLocalizations.of(context)!.composerUploadImageHint,
+                    button: true,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.image,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      tooltip: AppLocalizations.of(context)!.uploadImage,
+                      onPressed: _handleImageUpload,
                     ),
-                    tooltip: AppLocalizations.of(context)!.uploadImage,
-                    onPressed: _handleImageUpload,
                   ),
-                ),
-              // Camera button - same as above, straight from the camera
-              if (widget.onFileUpload != null && FilePickerUtils.canTakePhoto)
-                Semantics(
-                  label: AppLocalizations.of(context)!.takePhoto,
-                  button: true,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.photo_camera,
-                      color: colorScheme.onSurfaceVariant,
+                // Camera button - same as above, straight from the camera
+                if (widget.onFileUpload != null && FilePickerUtils.canTakePhoto)
+                  Semantics(
+                    label: AppLocalizations.of(context)!.takePhoto,
+                    button: true,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.photo_camera,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      tooltip: AppLocalizations.of(context)!.takePhoto,
+                      onPressed: () => _handleImageUpload(fromCamera: true),
                     ),
-                    tooltip: AppLocalizations.of(context)!.takePhoto,
-                    onPressed: () => _handleImageUpload(fromCamera: true),
                   ),
-                ),
-              // Formatting button
-              Semantics(
-                label: AppLocalizations.of(context)!.formatting,
-                hint: AppLocalizations.of(context)!.composerFormattingHint,
-                button: true,
-                enabled: _isContentFieldFocused,
-                child: PopupMenuButton<String>(
+                // Formatting button
+                Semantics(
+                  label: AppLocalizations.of(context)!.formatting,
+                  hint: AppLocalizations.of(context)!.composerFormattingHint,
+                  button: true,
                   enabled: _isContentFieldFocused,
-                  // `text_format`, not `format_bold`: this opens a menu of
-                  // thirteen actions (bold through spoiler and lists), and a
-                  // bold glyph reads as a bold *button* — so the other twelve
-                  // looked absent rather than one tap away.
-                  icon: Icon(Icons.text_format, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
-                  tooltip: AppLocalizations.of(context)!.formatting,
-                  onSelected: _insertMarkup,
-                itemBuilder: (context) => [
-                  // Text formatting
-                  PopupMenuItem(
-                    value: 'B',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_bold, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.bold),
-                      ],
+                  child: PopupMenuButton<String>(
+                    enabled: _isContentFieldFocused,
+                    // `text_format`, not `format_bold`: this opens a menu of
+                    // thirteen actions (bold through spoiler and lists), and a
+                    // bold glyph reads as a bold *button* — so the other twelve
+                    // looked absent rather than one tap away.
+                    icon: Icon(Icons.text_format, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
+                    tooltip: AppLocalizations.of(context)!.formatting,
+                    onSelected: _insertMarkup,
+                  itemBuilder: (context) => [
+                    // Text formatting
+                    PopupMenuItem(
+                      value: 'B',
+                      child: Row(
+                        children: [
+                          Icon(Icons.format_bold, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.bold),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'I',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_italic, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.kit.italic),
-                      ],
+                    PopupMenuItem(
+                      value: 'I',
+                      child: Row(
+                        children: [
+                          Icon(Icons.format_italic, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.kit.italic),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'U',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_underline, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.underline),
-                      ],
+                    PopupMenuItem(
+                      value: 'U',
+                      child: Row(
+                        children: [
+                          Icon(Icons.format_underline, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.underline),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'S',
-                    child: Row(
-                      children: [
-                        Icon(Icons.strikethrough_s, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.strikethrough),
-                      ],
+                    PopupMenuItem(
+                      value: 'S',
+                      child: Row(
+                        children: [
+                          Icon(Icons.strikethrough_s, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.strikethrough),
+                        ],
+                      ),
                     ),
-                  ),
-                  const PopupMenuDivider(),
-                  // Links and Media
-                  PopupMenuItem(
-                    value: 'URL',
-                    child: Row(
-                      children: [
-                        Icon(Icons.link, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.kit.link),
-                      ],
+                    const PopupMenuDivider(),
+                    // Links and Media
+                    PopupMenuItem(
+                      value: 'URL',
+                      child: Row(
+                        children: [
+                          Icon(Icons.link, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.kit.link),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'IMG',
-                    child: Row(
-                      children: [
-                        Icon(Icons.image, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.kit.image),
-                      ],
+                    PopupMenuItem(
+                      value: 'IMG',
+                      child: Row(
+                        children: [
+                          Icon(Icons.image, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.kit.image),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'VIDEO',
-                    child: Row(
-                      children: [
-                        Icon(Icons.videocam, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.video),
-                      ],
+                    PopupMenuItem(
+                      value: 'VIDEO',
+                      child: Row(
+                        children: [
+                          Icon(Icons.videocam, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.video),
+                        ],
+                      ),
                     ),
-                  ),
-                  const PopupMenuDivider(),
-                  // Content blocks
-                  PopupMenuItem(
-                    value: 'QUOTE',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_quote, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.kit.quote),
-                      ],
+                    const PopupMenuDivider(),
+                    // Content blocks
+                    PopupMenuItem(
+                      value: 'QUOTE',
+                      child: Row(
+                        children: [
+                          Icon(Icons.format_quote, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.kit.quote),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'CODE',
-                    child: Row(
-                      children: [
-                        Icon(Icons.code, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.kit.code),
-                      ],
+                    PopupMenuItem(
+                      value: 'CODE',
+                      child: Row(
+                        children: [
+                          Icon(Icons.code, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.kit.code),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'SPOILER',
-                    child: Row(
-                      children: [
-                        Icon(Icons.visibility_off, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.spoiler),
-                      ],
+                    PopupMenuItem(
+                      value: 'SPOILER',
+                      child: Row(
+                        children: [
+                          Icon(Icons.visibility_off, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.spoiler),
+                        ],
+                      ),
                     ),
-                  ),
-                  const PopupMenuDivider(),
-                  // Lists
-                  PopupMenuItem(
-                    value: 'LIST',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_list_bulleted, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.bulletList),
-                      ],
+                    const PopupMenuDivider(),
+                    // Lists
+                    PopupMenuItem(
+                      value: 'LIST',
+                      child: Row(
+                        children: [
+                          Icon(Icons.format_list_bulleted, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.bulletList),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: 'LIST=1',
-                    child: Row(
-                      children: [
-                        Icon(Icons.format_list_numbered, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.numberedList),
-                      ],
+                    PopupMenuItem(
+                      value: 'LIST=1',
+                      child: Row(
+                        children: [
+                          Icon(Icons.format_list_numbered, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.numberedList),
+                        ],
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: '*',
-                    child: Row(
-                      children: [
-                        Icon(Icons.subdirectory_arrow_right, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: DesignTokens.spacingS),
-                        Text(AppLocalizations.of(context)!.listItem),
-                      ],
+                    PopupMenuItem(
+                      value: '*',
+                      child: Row(
+                        children: [
+                          Icon(Icons.subdirectory_arrow_right, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: DesignTokens.spacingS),
+                          Text(AppLocalizations.of(context)!.listItem),
+                        ],
+                      ),
                     ),
+                    // Alignment options removed — stock Discourse has no
+                    // markup for text alignment (its markdown-it only
+                    // parses b/i/u/s/code/url/email/img inline BBCode),
+                    // so [LEFT]/[CENTER]/[RIGHT] would post as literal text.
+                  ],
                   ),
-                  // Alignment options removed — stock Discourse has no
-                  // markup for text alignment (its markdown-it only
-                  // parses b/i/u/s/code/url/email/img inline BBCode),
-                  // so [LEFT]/[CENTER]/[RIGHT] would post as literal text.
-                ],
                 ),
-              ),
-              // Mention button: the full search, where the strip above
-              // offers the likely few.
-              if (_canMention)
-                IconButton(
-                  icon: Icon(Icons.alternate_email, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
-                  tooltip: AppLocalizations.of(context)!.mentionUser,
-                  onPressed: _isContentFieldFocused ? _handleMention : null,
-                ),
-              // Discourse whisper toggle (staff-only reply mode)
-              if (widget.showWhisperToggle)
-                IconButton(
-                  icon: Icon(
-                    _isWhisper ? Icons.visibility_off : Icons.visibility_off_outlined,
-                    color: _isWhisper ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                // A poll goes at the cursor, or at the end: it does not wait
+                // for the text's focus.
+                if (_canBuildPoll)
+                  IconButton(
+                    icon: Icon(Icons.poll_outlined,
+                        color: colorScheme.onSurfaceVariant),
+                    tooltip: AppLocalizations.of(context)!.pollBuild,
+                    onPressed: _isSubmitting ? null : _buildPoll,
                   ),
-                  tooltip: _isWhisper
-                      ? AppLocalizations.of(context)!.whisperOnStaffOnly
-                      : AppLocalizations.of(context)!.whisperStaffOnly,
-                  onPressed: () {
-                    setState(() => _isWhisper = !_isWhisper);
-                    widget.onWhisperChanged?.call(_isWhisper);
-                  },
-                ),
-            ],
+                // Mention button: the full search, where the strip above
+                // offers the likely few.
+                if (_canMention)
+                  IconButton(
+                    icon: Icon(Icons.alternate_email, color: _isContentFieldFocused ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withValues(alpha: 0.38)),
+                    tooltip: AppLocalizations.of(context)!.mentionUser,
+                    onPressed: _isContentFieldFocused ? _handleMention : null,
+                  ),
+                // Discourse whisper toggle (staff-only reply mode)
+                if (widget.showWhisperToggle)
+                  IconButton(
+                    icon: Icon(
+                      _isWhisper ? Icons.visibility_off : Icons.visibility_off_outlined,
+                      color: _isWhisper ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                    ),
+                    tooltip: _isWhisper
+                        ? AppLocalizations.of(context)!.whisperOnStaffOnly
+                        : AppLocalizations.of(context)!.whisperStaffOnly,
+                    onPressed: () {
+                      setState(() => _isWhisper = !_isWhisper);
+                      widget.onWhisperChanged?.call(_isWhisper);
+                    },
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1746,6 +1847,7 @@ class _MessageComposePageState extends State<MessageComposePage> {
                 ),
               ),
               _buildContentMissingLine(),
+              _buildPollStrip(),
               _buildUploadStrip(),
               _buildMentionStrip(),
               _buildBottomToolbar(),

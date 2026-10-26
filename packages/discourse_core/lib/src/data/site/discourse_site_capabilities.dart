@@ -246,6 +246,24 @@ class DiscourseSiteCapabilities {
   /// composer neither suggests nor completes them, and nor does the app's.
   bool enableMentions = true;
 
+  /// The poll plugin's `poll_enabled`: false until the settings say so.
+  bool pollEnabled = false;
+
+  /// `poll_maximum_options`: the most options a poll may have (and the
+  /// most numbers a number rating may offer).
+  int pollMaximumOptions = 20;
+
+  /// `poll_default_public`: whether a new poll shows who voted.
+  bool pollDefaultPublic = true;
+
+  /// The signed-in reader may create polls (`current_user.can_create_poll`:
+  /// staff, or in `poll_create_allowed_groups`); see [storeCurrentUser].
+  /// Kept apart from the rest, which a sign-in starts afresh when it
+  /// re-reads the forum's settings, just after `current_user` was read.
+  bool get canCreatePoll => _canCreatePoll[_siteKey] ?? false;
+
+  static final Map<String, bool> _canCreatePoll = {};
+
   /// True once a real payload has been parsed for this forum. Distinguishes
   /// "asked, offers nothing" from "never asked".
   bool resolved = false;
@@ -459,6 +477,17 @@ class DiscourseSiteCapabilities {
     caps.preventUploadsOnlyPosts =
         settings['prevent_uploads_only_posts'] == true;
     caps.enableMentions = settings['enable_mentions'] != false;
+    caps.pollEnabled = settings['poll_enabled'] == true;
+    caps.pollMaximumOptions =
+        positive('poll_maximum_options') ?? caps.pollMaximumOptions;
+    caps.pollDefaultPublic = settings['poll_default_public'] != false;
+  }
+
+  /// Records what `/session/current.json`'s `current_user` says the reader
+  /// may do here that the forum's settings do not.
+  static void storeCurrentUser(
+      String pluginUrl, Map<String, dynamic> currentUser) {
+    _canCreatePoll[pluginUrl] = currentUser['can_create_poll'] == true;
   }
 
   /// Records each category's topics of the past week, and its latest
@@ -518,6 +547,7 @@ class DiscourseSiteCapabilities {
   static void reset() {
     _bySite.clear();
     _sessions.clear();
+    _canCreatePoll.clear();
   }
 }
 

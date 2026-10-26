@@ -4934,4 +4934,129 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get topicBookmarksDeleted => 'Bladwijzers verwijderd';
+
+  @override
+  String get pollBuild => 'Peiling maken';
+
+  @override
+  String get pollEdit => 'Peiling bewerken';
+
+  @override
+  String get pollInsert => 'Invoegen';
+
+  @override
+  String get pollTypeRegular => 'Eén keuze';
+
+  @override
+  String get pollTypeMultiple => 'Meerkeuze';
+
+  @override
+  String get pollTypeNumber => 'Cijferbeoordeling';
+
+  @override
+  String get pollTitleOptional => 'Titel (optioneel)';
+
+  @override
+  String pollOptionLabel(int number) {
+    return 'Optie $number';
+  }
+
+  @override
+  String get pollRemoveOption => 'Optie verwijderen';
+
+  @override
+  String get pollAddOption => 'Optie toevoegen';
+
+  @override
+  String get pollMinChoices => 'Minimaal aantal keuzes';
+
+  @override
+  String get pollMaxChoices => 'Maximaal aantal keuzes';
+
+  @override
+  String get pollNumberMin => 'Minimum';
+
+  @override
+  String get pollNumberMax => 'Maximum';
+
+  @override
+  String get pollNumberStep => 'Stap';
+
+  @override
+  String get pollResultsLabel => 'Resultaten tonen';
+
+  @override
+  String get pollResultsAlways => 'Altijd';
+
+  @override
+  String get pollResultsOnVote => 'Na het stemmen';
+
+  @override
+  String get pollResultsOnClose => 'Als de peiling sluit';
+
+  @override
+  String get pollResultsStaffOnly => 'Alleen voor medewerkers';
+
+  @override
+  String get pollShowWhoVoted => 'Tonen wie er gestemd heeft';
+
+  @override
+  String get pollCloseAutomatically => 'Automatisch sluiten';
+
+  @override
+  String get pollNeverCloses => 'Nooit';
+
+  @override
+  String get pollDontClose => 'Niet automatisch sluiten';
+
+  @override
+  String get pollChart => 'Grafiek';
+
+  @override
+  String get pollChartBar => 'Staaf';
+
+  @override
+  String get pollChartPie => 'Taart';
+
+  @override
+  String get pollEnterNumber => 'Voer een getal in';
+
+  @override
+  String get pollStepTooSmall => 'Minstens 1';
+
+  @override
+  String get pollNumberTooFew =>
+      'Laat minder dan twee getallen over om uit te kiezen';
+
+  @override
+  String pollNumberTooMany(int count) {
+    return 'Geeft meer dan $count getallen om uit te kiezen';
+  }
+
+  @override
+  String get pollNeedsOption => 'Voeg minstens één optie toe';
+
+  @override
+  String get pollOptionsMustDiffer => 'Elke optie moet anders zijn';
+
+  @override
+  String pollTooManyOptions(int count) {
+    return 'Maximaal $count opties';
+  }
+
+  @override
+  String get pollMultipleNeedsTwo =>
+      'Meerkeuze heeft minstens twee opties nodig';
+
+  @override
+  String get pollCloseInPast => 'Kies een tijdstip in de toekomst';
+
+  @override
+  String get pollFewer => 'Minder';
+
+  @override
+  String get pollMore => 'Meer';
+
+  @override
+  String get pollRemove => 'Peiling verwijderen';
 }

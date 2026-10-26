@@ -756,6 +756,8 @@ class DiscourseLoginService {
     // Unsent chat messages, kept on the server: a channel opens with what
     // the reader left in it, here or on the web.
     DiscourseChatDrafts.storeFromCurrentUser(siteContext.site.url, cu['chat_drafts']);
+    // Whether the composer offers the poll builder.
+    DiscourseSiteCapabilities.storeCurrentUser(siteContext.site.pluginUrl, cu);
   }
 
   /// The reader's own sidebar (their categories and tags) and trust level,

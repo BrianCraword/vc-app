@@ -4631,4 +4631,127 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get topicBookmarksDeleted => '书签已删除';
+
+  @override
+  String get pollBuild => '创建投票';
+
+  @override
+  String get pollEdit => '编辑投票';
+
+  @override
+  String get pollInsert => '插入';
+
+  @override
+  String get pollTypeRegular => '单选';
+
+  @override
+  String get pollTypeMultiple => '多选';
+
+  @override
+  String get pollTypeNumber => '数字评分';
+
+  @override
+  String get pollTitleOptional => '标题（可选）';
+
+  @override
+  String pollOptionLabel(int number) {
+    return '选项 $number';
+  }
+
+  @override
+  String get pollRemoveOption => '删除选项';
+
+  @override
+  String get pollAddOption => '添加选项';
+
+  @override
+  String get pollMinChoices => '最少选择数';
+
+  @override
+  String get pollMaxChoices => '最多选择数';
+
+  @override
+  String get pollNumberMin => '最小值';
+
+  @override
+  String get pollNumberMax => '最大值';
+
+  @override
+  String get pollNumberStep => '步长';
+
+  @override
+  String get pollResultsLabel => '显示结果';
+
+  @override
+  String get pollResultsAlways => '始终';
+
+  @override
+  String get pollResultsOnVote => '投票后';
+
+  @override
+  String get pollResultsOnClose => '投票结束时';
+
+  @override
+  String get pollResultsStaffOnly => '仅限管理人员';
+
+  @override
+  String get pollShowWhoVoted => '显示投票者';
+
+  @override
+  String get pollCloseAutomatically => '自动结束';
+
+  @override
+  String get pollNeverCloses => '从不';
+
+  @override
+  String get pollDontClose => '不自动结束';
+
+  @override
+  String get pollChart => '图表';
+
+  @override
+  String get pollChartBar => '柱状图';
+
+  @override
+  String get pollChartPie => '饼图';
+
+  @override
+  String get pollEnterNumber => '请输入数字';
+
+  @override
+  String get pollStepTooSmall => '至少为 1';
+
+  @override
+  String get pollNumberTooFew => '可选数字少于两个';
+
+  @override
+  String pollNumberTooMany(int count) {
+    return '可选数字超过 $count 个';
+  }
+
+  @override
+  String get pollNeedsOption => '请至少添加一个选项';
+
+  @override
+  String get pollOptionsMustDiffer => '选项不能重复';
+
+  @override
+  String pollTooManyOptions(int count) {
+    return '最多 $count 个选项';
+  }
+
+  @override
+  String get pollMultipleNeedsTwo => '多选至少需要两个选项';
+
+  @override
+  String get pollCloseInPast => '请选择将来的时间';
+
+  @override
+  String get pollFewer => '减少';
+
+  @override
+  String get pollMore => '增加';
+
+  @override
+  String get pollRemove => '移除投票';
 }

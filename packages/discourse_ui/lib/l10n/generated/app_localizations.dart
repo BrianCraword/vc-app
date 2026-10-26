@@ -7991,6 +7991,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bookmarks deleted'**
   String get topicBookmarksDeleted;
+
+  /// Composer toolbar button and the poll builder's title: make a poll to put in the post (Discourse's 'Build Poll')
+  ///
+  /// In en, this message translates to:
+  /// **'Build poll'**
+  String get pollBuild;
+
+  /// The poll builder's title, and the composer's chip action, for a poll already in the post
+  ///
+  /// In en, this message translates to:
+  /// **'Edit poll'**
+  String get pollEdit;
+
+  /// Poll builder: the button that puts the new poll in the post
+  ///
+  /// In en, this message translates to:
+  /// **'Insert'**
+  String get pollInsert;
+
+  /// Poll builder: a poll where each voter picks one option
+  ///
+  /// In en, this message translates to:
+  /// **'Single choice'**
+  String get pollTypeRegular;
+
+  /// Poll builder: a poll where each voter may pick several options
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple choice'**
+  String get pollTypeMultiple;
+
+  /// Poll builder: a poll where voters pick a number in a range
+  ///
+  /// In en, this message translates to:
+  /// **'Number rating'**
+  String get pollTypeNumber;
+
+  /// Poll builder: the poll's title field, which may be left empty
+  ///
+  /// In en, this message translates to:
+  /// **'Title (optional)'**
+  String get pollTitleOptional;
+
+  /// Poll builder: the label of one option's field
+  ///
+  /// In en, this message translates to:
+  /// **'Option {number}'**
+  String pollOptionLabel(int number);
+
+  /// Poll builder: tooltip of the button that removes an option
+  ///
+  /// In en, this message translates to:
+  /// **'Remove option'**
+  String get pollRemoveOption;
+
+  /// Poll builder: adds a field for another option
+  ///
+  /// In en, this message translates to:
+  /// **'Add option'**
+  String get pollAddOption;
+
+  /// Poll builder, multiple choice: the fewest options a voter must pick
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum choices'**
+  String get pollMinChoices;
+
+  /// Poll builder, multiple choice: the most options a voter may pick
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum choices'**
+  String get pollMaxChoices;
+
+  /// Poll builder, number rating: the lowest number
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum'**
+  String get pollNumberMin;
+
+  /// Poll builder, number rating: the highest number
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum'**
+  String get pollNumberMax;
+
+  /// Poll builder, number rating: the gap between the numbers offered
+  ///
+  /// In en, this message translates to:
+  /// **'Step'**
+  String get pollNumberStep;
+
+  /// Poll builder: heading of the choice of when the results can be seen
+  ///
+  /// In en, this message translates to:
+  /// **'Show results'**
+  String get pollResultsLabel;
+
+  /// Poll builder: results can always be seen
+  ///
+  /// In en, this message translates to:
+  /// **'Always'**
+  String get pollResultsAlways;
+
+  /// Poll builder: a voter sees the results once they have voted
+  ///
+  /// In en, this message translates to:
+  /// **'After voting'**
+  String get pollResultsOnVote;
+
+  /// Poll builder: results show once the poll is closed
+  ///
+  /// In en, this message translates to:
+  /// **'When the poll closes'**
+  String get pollResultsOnClose;
+
+  /// Poll builder: only the forum's staff see the results
+  ///
+  /// In en, this message translates to:
+  /// **'To staff only'**
+  String get pollResultsStaffOnly;
+
+  /// Poll builder: switch for whether voters are shown with the results (Discourse's public poll)
+  ///
+  /// In en, this message translates to:
+  /// **'Show who voted'**
+  String get pollShowWhoVoted;
+
+  /// Poll builder: when the poll closes by itself; tapping picks a date and time
+  ///
+  /// In en, this message translates to:
+  /// **'Close automatically'**
+  String get pollCloseAutomatically;
+
+  /// Poll builder: shown under 'Close automatically' when no closing time is set
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get pollNeverCloses;
+
+  /// Poll builder: tooltip of the button that clears the closing time
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t close automatically'**
+  String get pollDontClose;
+
+  /// Poll builder: heading of the choice of chart the results are drawn as
+  ///
+  /// In en, this message translates to:
+  /// **'Chart'**
+  String get pollChart;
+
+  /// Poll builder: results as a bar chart
+  ///
+  /// In en, this message translates to:
+  /// **'Bar'**
+  String get pollChartBar;
+
+  /// Poll builder: results as a pie chart
+  ///
+  /// In en, this message translates to:
+  /// **'Pie'**
+  String get pollChartPie;
+
+  /// Poll builder: a number field was left empty
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number'**
+  String get pollEnterNumber;
+
+  /// Poll builder: the step of a number rating must be 1 or more
+  ///
+  /// In en, this message translates to:
+  /// **'At least 1'**
+  String get pollStepTooSmall;
+
+  /// Poll builder: the number rating's range and step leave fewer than two numbers
+  ///
+  /// In en, this message translates to:
+  /// **'Leaves fewer than two numbers to choose from'**
+  String get pollNumberTooFew;
+
+  /// Poll builder: the number rating would offer more numbers than the forum allows options
+  ///
+  /// In en, this message translates to:
+  /// **'Makes more than {count} numbers to choose from'**
+  String pollNumberTooMany(int count);
+
+  /// Poll builder: Insert was tapped with every option empty
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one option'**
+  String get pollNeedsOption;
+
+  /// Poll builder: two options are the same
+  ///
+  /// In en, this message translates to:
+  /// **'Each option must be different'**
+  String get pollOptionsMustDiffer;
+
+  /// Poll builder: more options than the forum allows
+  ///
+  /// In en, this message translates to:
+  /// **'At most {count} options'**
+  String pollTooManyOptions(int count);
+
+  /// Poll builder: a multiple-choice poll with only one option
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple choice needs at least two options'**
+  String get pollMultipleNeedsTwo;
+
+  /// Poll builder: the closing time picked has already passed
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a time in the future'**
+  String get pollCloseInPast;
+
+  /// Poll builder: tooltip of the − button beside a number of choices
+  ///
+  /// In en, this message translates to:
+  /// **'Fewer'**
+  String get pollFewer;
+
+  /// Poll builder: tooltip of the + button beside a number of choices
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get pollMore;
+
+  /// Composer: tooltip of the button on a poll's chip that takes the poll out of the post
+  ///
+  /// In en, this message translates to:
+  /// **'Remove poll'**
+  String get pollRemove;
 }
 
 class _AppLocalizationsDelegate

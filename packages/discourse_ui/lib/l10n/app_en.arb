@@ -6229,5 +6229,176 @@
   "topicBookmarksDeleted": "Bookmarks deleted",
   "@topicBookmarksDeleted": {
     "description": "Shown after the reader deleted all their bookmarks in a topic"
+  },
+  "pollBuild": "Build poll",
+  "@pollBuild": {
+    "description": "Composer toolbar button and the poll builder's title: make a poll to put in the post (Discourse's 'Build Poll')"
+  },
+  "pollEdit": "Edit poll",
+  "@pollEdit": {
+    "description": "The poll builder's title, and the composer's chip action, for a poll already in the post"
+  },
+  "pollInsert": "Insert",
+  "@pollInsert": {
+    "description": "Poll builder: the button that puts the new poll in the post"
+  },
+  "pollTypeRegular": "Single choice",
+  "@pollTypeRegular": {
+    "description": "Poll builder: a poll where each voter picks one option"
+  },
+  "pollTypeMultiple": "Multiple choice",
+  "@pollTypeMultiple": {
+    "description": "Poll builder: a poll where each voter may pick several options"
+  },
+  "pollTypeNumber": "Number rating",
+  "@pollTypeNumber": {
+    "description": "Poll builder: a poll where voters pick a number in a range"
+  },
+  "pollTitleOptional": "Title (optional)",
+  "@pollTitleOptional": {
+    "description": "Poll builder: the poll's title field, which may be left empty"
+  },
+  "pollOptionLabel": "Option {number}",
+  "@pollOptionLabel": {
+    "description": "Poll builder: the label of one option's field",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "pollRemoveOption": "Remove option",
+  "@pollRemoveOption": {
+    "description": "Poll builder: tooltip of the button that removes an option"
+  },
+  "pollAddOption": "Add option",
+  "@pollAddOption": {
+    "description": "Poll builder: adds a field for another option"
+  },
+  "pollMinChoices": "Minimum choices",
+  "@pollMinChoices": {
+    "description": "Poll builder, multiple choice: the fewest options a voter must pick"
+  },
+  "pollMaxChoices": "Maximum choices",
+  "@pollMaxChoices": {
+    "description": "Poll builder, multiple choice: the most options a voter may pick"
+  },
+  "pollNumberMin": "Minimum",
+  "@pollNumberMin": {
+    "description": "Poll builder, number rating: the lowest number"
+  },
+  "pollNumberMax": "Maximum",
+  "@pollNumberMax": {
+    "description": "Poll builder, number rating: the highest number"
+  },
+  "pollNumberStep": "Step",
+  "@pollNumberStep": {
+    "description": "Poll builder, number rating: the gap between the numbers offered"
+  },
+  "pollResultsLabel": "Show results",
+  "@pollResultsLabel": {
+    "description": "Poll builder: heading of the choice of when the results can be seen"
+  },
+  "pollResultsAlways": "Always",
+  "@pollResultsAlways": {
+    "description": "Poll builder: results can always be seen"
+  },
+  "pollResultsOnVote": "After voting",
+  "@pollResultsOnVote": {
+    "description": "Poll builder: a voter sees the results once they have voted"
+  },
+  "pollResultsOnClose": "When the poll closes",
+  "@pollResultsOnClose": {
+    "description": "Poll builder: results show once the poll is closed"
+  },
+  "pollResultsStaffOnly": "To staff only",
+  "@pollResultsStaffOnly": {
+    "description": "Poll builder: only the forum's staff see the results"
+  },
+  "pollShowWhoVoted": "Show who voted",
+  "@pollShowWhoVoted": {
+    "description": "Poll builder: switch for whether voters are shown with the results (Discourse's public poll)"
+  },
+  "pollCloseAutomatically": "Close automatically",
+  "@pollCloseAutomatically": {
+    "description": "Poll builder: when the poll closes by itself; tapping picks a date and time"
+  },
+  "pollNeverCloses": "Never",
+  "@pollNeverCloses": {
+    "description": "Poll builder: shown under 'Close automatically' when no closing time is set"
+  },
+  "pollDontClose": "Don't close automatically",
+  "@pollDontClose": {
+    "description": "Poll builder: tooltip of the button that clears the closing time"
+  },
+  "pollChart": "Chart",
+  "@pollChart": {
+    "description": "Poll builder: heading of the choice of chart the results are drawn as"
+  },
+  "pollChartBar": "Bar",
+  "@pollChartBar": {
+    "description": "Poll builder: results as a bar chart"
+  },
+  "pollChartPie": "Pie",
+  "@pollChartPie": {
+    "description": "Poll builder: results as a pie chart"
+  },
+  "pollEnterNumber": "Enter a number",
+  "@pollEnterNumber": {
+    "description": "Poll builder: a number field was left empty"
+  },
+  "pollStepTooSmall": "At least 1",
+  "@pollStepTooSmall": {
+    "description": "Poll builder: the step of a number rating must be 1 or more"
+  },
+  "pollNumberTooFew": "Leaves fewer than two numbers to choose from",
+  "@pollNumberTooFew": {
+    "description": "Poll builder: the number rating's range and step leave fewer than two numbers"
+  },
+  "pollNumberTooMany": "Makes more than {count} numbers to choose from",
+  "@pollNumberTooMany": {
+    "description": "Poll builder: the number rating would offer more numbers than the forum allows options",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pollNeedsOption": "Add at least one option",
+  "@pollNeedsOption": {
+    "description": "Poll builder: Insert was tapped with every option empty"
+  },
+  "pollOptionsMustDiffer": "Each option must be different",
+  "@pollOptionsMustDiffer": {
+    "description": "Poll builder: two options are the same"
+  },
+  "pollTooManyOptions": "At most {count} options",
+  "@pollTooManyOptions": {
+    "description": "Poll builder: more options than the forum allows",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pollMultipleNeedsTwo": "Multiple choice needs at least two options",
+  "@pollMultipleNeedsTwo": {
+    "description": "Poll builder: a multiple-choice poll with only one option"
+  },
+  "pollCloseInPast": "Pick a time in the future",
+  "@pollCloseInPast": {
+    "description": "Poll builder: the closing time picked has already passed"
+  },
+  "pollFewer": "Fewer",
+  "@pollFewer": {
+    "description": "Poll builder: tooltip of the − button beside a number of choices"
+  },
+  "pollMore": "More",
+  "@pollMore": {
+    "description": "Poll builder: tooltip of the + button beside a number of choices"
+  },
+  "pollRemove": "Remove poll",
+  "@pollRemove": {
+    "description": "Composer: tooltip of the button on a poll's chip that takes the poll out of the post"
   }
 }
