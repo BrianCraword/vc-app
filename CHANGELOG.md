@@ -6,6 +6,21 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [1.0.53] - 2026-10-26
+
+### Added
+- **Build a poll in the composer.** Where the forum has polls and you may create them, the toolbar has Build poll: single choice, multiple choice (how many a voter picks) or a number rating, an optional title, the options, who sees the results and when, whether voters are shown, a closing time, and a bar or pie chart. Anything the forum would refuse is said under the field concerned. The poll goes into the post as the same `[poll]` block the web writes, and each poll in the text gets a chip above the toolbar that opens it again or takes it out. Before, a poll had to be typed as markup.
+- **Typing @ suggests people.** Up to five chips appear above the toolbar: the author of the post you're replying to first, then the topic's latest posters. From the second letter, the forum's matching members join them. A tap puts the mention in, and the @ button still opens the full search. On a forum with mentions turned off, neither is shown.
+- **Long-press a topic in a list** for Dismiss (when it's new or unread), its notification level, Bookmark topic or Delete all bookmarks (which asks first, as the web does), Share and Copy link. Guests get Share and Copy link.
+- **Swipe a new or unread topic to dismiss it.** The topic stays in the list and its dot or count goes. A topic you never opened stops being new without being marked read. Screen readers get Dismiss as an action on the row.
+- **Each category card shows its latest topic**: its title and when it was last posted in. A tap opens the topic at its last post. The topics come with the category list, so there is no extra request per category.
+
+### Changed
+- **The composer says what's missing where it is missing**, instead of in a message at the bottom of the screen that was gone by the time you looked for the field. An empty title is said under the title. An empty post outlines the text in red and is said just above the toolbar, where the keyboard can't cover it. Each message goes as soon as you type. Sending while files are still uploading says so above the uploads. The forum's own refusals ("Title is too short…") still show at the bottom.
+
+### Fixed
+- **Pulling to refresh Categories fetches the list again.** It used to show the same list for up to five minutes.
+
 ## [1.0.52] - 2026-10-10
 
 ### Added
