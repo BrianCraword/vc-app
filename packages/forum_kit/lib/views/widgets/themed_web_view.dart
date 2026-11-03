@@ -26,12 +26,21 @@ class ThemedWebView extends StatefulWidget {
   /// password used to abandon sign-in altogether.
   final bool backGoesThroughHistory;
 
+  /// Called with the controller each time a page finishes loading, after the
+  /// cover is lifted. For a caller that has somewhere to go once the web
+  /// view arrives somewhere — a sign-in hop that has to carry on to the page
+  /// the reader asked for, say. The controller is the only way to navigate
+  /// a view this widget owns.
+  final void Function(InAppWebViewController controller, WebUri? url)?
+      onNavigated;
+
   const ThemedWebView({
     super.key,
     required this.url,
     this.initialSettings,
     this.shouldOverrideUrlLoading,
     this.backGoesThroughHistory = false,
+    this.onNavigated,
   });
 
   @override
@@ -91,7 +100,12 @@ class _ThemedWebViewState extends State<ThemedWebView> {
               initialSettings: widget.initialSettings,
               shouldOverrideUrlLoading: widget.shouldOverrideUrlLoading,
               onPageCommitVisible: (_, __) => _reveal(),
-              onLoadStop: (_, __) => _reveal(),
+              onLoadStop: (controller, url) {
+                // _reveal first: a caller that navigates on from here must
+                // not leave the cover up over the page it moves to.
+                _reveal();
+                widget.onNavigated?.call(controller, url);
+              },
               onReceivedError: (_, __, ___) => _reveal(),
               onWebViewCreated: (controller) => _web = controller,
               onUpdateVisitedHistory: widget.backGoesThroughHistory
