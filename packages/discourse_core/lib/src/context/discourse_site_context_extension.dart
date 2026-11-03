@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../network/discourse_client.dart';
 import '../storage/discourse_secure_storage.dart';
 import '../data/message/discourse_message_tracking.dart';
+import '../data/site/discourse_sidebar_sections.dart';
 import '../data/site/discourse_site_capabilities.dart';
 
 /// Discourse-specific authentication state attached to a [SiteContext].
@@ -141,6 +142,9 @@ extension DiscourseSiteContextExtension on SiteContext {
     _noteCredentialsForReadCache();
     // The reader's sidebar, trust level and link access go with the session.
     setSidebar();
+    // Their own sidebar sections go too; the forum's defaults stay, because
+    // those are the forum's and a signed-out reader still sees them.
+    DiscourseSidebarSections.clearOwn(site.url);
     setTrustLevel(null);
     setLinkPostingAccess(null);
 

@@ -775,6 +775,11 @@ class DiscourseLoginService {
         .where((t) => t.isNotEmpty)
         .toList();
     siteContext.setSidebar(categoryIds: ids, tags: tags);
+    // The member's own sidebar sections — the forum's links, as configured
+    // in Discourse. The drawer renders them, so a link added on the forum
+    // reaches the app with no release.
+    DiscourseSidebarSections.storeFromCurrentUser(
+        siteContext.site.url, cu['sidebar_sections']);
     final tl = cu['trust_level'];
     siteContext.setTrustLevel(tl is int ? tl : int.tryParse('${tl ?? ''}'));
     // Whether a post may carry a link, which the host's "Sent from" line

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:discourse_core/discourse_core.dart'
     show
+        DiscourseSidebarSections,
         DiscourseSiteCapabilities,
         DiscourseSiteContextExtension,
         DiscourseTopicTracking;
+import 'package:forum_kit/utils/discourse_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:forumcopilot_sdk/context/site_context.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,8 +14,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/site_controller.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../theme/forum_identity.dart';
+import '../../services/sidebar_link_router.dart';
 import '../../utils/forum_legal_links.dart';
 import '../badges_directory_page.dart';
+import '../forum_page_web_view.dart';
 import '../forum_topics_page.dart';
 import '../groups_list_page.dart';
 import '../in_app_web_view_page.dart';
@@ -57,6 +62,57 @@ class SiteDrawer extends StatelessWidget {
   });
 
   /// How many categories and tags the drawer lists before "All …".
+  /// Sections built from the forum's own sidebar.
+  ///
+  /// [routeSidebarLink] decides where each link goes; a link the app renders
+  /// natively ([SidebarNative]) is dropped, because the hardcoded items above
+  /// already offer it. Category links are routed but not shown yet — the
+  /// Categories section below covers the reader's own.
+  List<Widget> _forumSidebarSections(BuildContext context) {
+    final sections = DiscourseSidebarSections.forSite(siteContext.site.url);
+    final out = <Widget>[];
+
+    for (final section in sections) {
+      final items = <Widget>[];
+      for (final link in section.links) {
+        final destination = routeSidebarLink(link);
+        if (destination is SidebarWeb) {
+          items.add(_Item(
+            icon: materialIconForDiscourseIcon(link.icon) ?? Icons.link,
+            label: link.name,
+            onTap: () => _push(
+              context,
+              ForumPageWebView(
+                siteContext: siteContext,
+                path: destination.path,
+                title: link.name,
+              ),
+            ),
+          ));
+        } else if (destination is SidebarExternal) {
+          items.add(_Item(
+            icon: materialIconForDiscourseIcon(link.icon) ?? Icons.open_in_new,
+            label: link.name,
+            // Off the forum, so the system browser rather than a view
+            // carrying the member's session.
+            onTap: () => launchUrl(destination.url,
+                mode: LaunchMode.externalApplication),
+          ));
+        }
+      }
+      if (items.isEmpty) continue;
+      out.add(_Section(
+        // The forum names its own sections; the community one is already
+        // labelled above, so its extras go under the forum's name instead
+        // of a second "Community".
+        id: 'forum-${section.id}',
+        label: section.isCommunity ? siteContext.site.name : section.title,
+        children: items,
+      ));
+    }
+    return out;
+  }
+
   static const _maxCategories = 8;
   static const _maxTags = 5;
 
@@ -145,6 +201,12 @@ class SiteDrawer extends StatelessWidget {
                 ),
               ],
             ),
+            // The forum's own sidebar, as configured in Discourse. Only the
+            // links the app has no screen for: the items above already cover
+            // Discourse's built-in ones natively, and repeating them here
+            // would show the reader two of each. A link added on the forum
+            // reaches the app with no release, which is the point.
+            ..._forumSidebarSections(context),
             _Section(
               id: 'categories',
               label: l10n.categoriesView,
