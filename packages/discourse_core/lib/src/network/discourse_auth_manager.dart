@@ -206,6 +206,128 @@ class DiscourseAuthManager {
     );
   }
 
+  /// Mint a one-time password and return the forum URL that trades it for a
+  /// signed-in browser session, for use as a web view's first page.
+  ///
+  /// Pages this app does not render natively — matchmaking, the Feed's own
+  /// views, the research library, anything a theme component draws — are web
+  /// pages, and a web view is a different client from this app: it carries
+  /// neither the User API Key nor a cookie, so it would open them signed out.
+  ///
+  /// Returns null whenever a password cannot be minted, which is an ordinary
+  /// outcome rather than an error: no key stored, a forum whose
+  /// `allow_user_api_key_scopes` omits `one_time_password`, a member outside
+  /// `user_api_key_allowed_groups`, or a request that simply failed. Callers
+  /// open the page signed out, which is what they already do today.
+  ///
+  /// **The returned URL is not itself a login.** Discourse establishes the
+  /// session only on a POST to it, and that POST is not exempt from forgery
+  /// protection — `one_time_password` skips `preload_json` and `check_xhr`
+  /// and nothing else. The GET renders a confirmation page whose form carries
+  /// the authenticity token, and the member taps it.
+  ///
+  /// Do not submit that form for them. It is the step where a human sees
+  /// whose account is about to be used, and it is what stops a password
+  /// minted for someone else's account from quietly becoming your session.
+  /// It costs one tap per install rather than per page: the session cookie
+  /// persists in the web view's own jar.
+  ///
+  /// The password is single-use and Discourse expires it after ten minutes,
+  /// so call this as a web view opens rather than ahead of time.
+  ///
+  /// On scopes, which are counter-intuitive here: the request is authorized
+  /// by the key's `write` scope, which matches any method on any action.
+  /// `one_time_password` maps to an empty matcher list and permits no route
+  /// at all — Discourse reads it as a site-level flag inside `create_otp`.
+  /// A key has to carry both, and `AppForumConfig` requests both.
+  Future<String?> oneTimeLoginUrl({
+    required String applicationName,
+    required String authRedirect,
+  }) async {
+    final key = siteContext.userApiKey;
+    if (key == null || key.isEmpty) return null;
+
+    // A throwaway keypair, not the handshake's: that private key is the
+    // app's stored credential, and `create_otp` matches a public key against
+    // any existing client's registered auth_redirect. A fresh pair matches no
+    // client and so carries no stored redirect to conflict with.
+    final keypair = _generateRsaKeypair();
+
+    try {
+      // `.json` rather than an Accept header: `create_otp` branches on
+      // `respond_to`, and the format suffix decides it without depending on
+      // what the client negotiates. The HTML branch would answer with a 302
+      // to a `discourse://` URL instead of the payload.
+      final result = await _client.post(
+        siteContext,
+        '/user-api-key/otp.json',
+        query: <String, dynamic>{
+          'application_name': applicationName,
+          'public_key': _publicKeyToPem(keypair.publicKey),
+          'auth_redirect': authRedirect,
+          'padding': _padding,
+        },
+      );
+
+      final status = result.statusCode;
+      if (status < 200 || status >= 300) {
+        // ignore: avoid_print
+        print('⚠️ [DISCOURSE_AUTH] oneTimeLoginUrl: mint refused '
+            '(HTTP $status). 403 usually means the forum does not allow the '
+            'one_time_password scope, or this member is outside '
+            'user_api_key_allowed_groups. Opening the page signed out.');
+        return null;
+      }
+
+      final json = jsonDecode(result.body) as Map<String, dynamic>;
+      final redirectUrl = json['redirect_url'] as String?;
+      if (redirectUrl == null || redirectUrl.isEmpty) return null;
+
+      // Discourse appends the password to our own auth_redirect, which is a
+      // custom scheme (discourse://auth_redirect) and never navigated to —
+      // it is a carrier for the parameter, nothing more.
+      final encrypted =
+          Uri.tryParse(redirectUrl)?.queryParameters['oneTimePassword'];
+      if (encrypted == null || encrypted.isEmpty) return null;
+
+      // Ruby's Base64.encode64 wraps at 60 characters, so the payload arrives
+      // with newlines in it; _normalizeBase64 is what the handshake already
+      // uses for the same reason.
+      final plaintext = _decryptPayload(
+        base64.decode(_normalizeBase64(encrypted)),
+        keypair.privateKey,
+      );
+      final otp = utf8.decode(plaintext).trim();
+
+      // The route constrains :token to hex. Decryption down the wrong padding
+      // branch yields plausible bytes rather than throwing, so checking the
+      // shape here turns a silent 404 inside the web view into the signed-out
+      // page the null path already handles.
+      if (!_otpToken.hasMatch(otp)) {
+        // ignore: avoid_print
+        print('⚠️ [DISCOURSE_AUTH] oneTimeLoginUrl: decrypted password is not '
+            'a hex token — the forum encrypted with an unexpected padding. '
+            'Opening the page signed out.');
+        return null;
+      }
+
+      final base = Uri.parse(siteContext.site.url);
+      return base
+          .replace(path: _joinPath(base.path, '/session/otp/$otp'))
+          .toString();
+    } catch (e) {
+      // Network failure, a non-JSON body, an undecryptable payload: every one
+      // of them means the same thing to the caller.
+      // ignore: avoid_print
+      print('⚠️ [DISCOURSE_AUTH] oneTimeLoginUrl: $e. '
+          'Opening the page signed out.');
+      return null;
+    }
+  }
+
+  /// Discourse's `session/otp/:token` route constrains the token to hex.
+  static final RegExp _otpToken = RegExp(r'^[0-9a-f]+$');
+
   /// Forget the locally stored User API Key. Does NOT call
   /// `/user-api-key/revoke` — for that, use [revokeKey].
   /// Drops the stored key. Also clears the client's short-lived read cache:
