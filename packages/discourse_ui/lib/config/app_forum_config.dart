@@ -11,7 +11,7 @@ class AppForumConfig {
   static const int siteId = 1;
 
   /// Human-readable forum name shown in app UI.
-  static const String forumName = 'Discourse';
+  static const String forumName = 'Victorious Christians';
 
   /// Base forum URL (without trailing slash).
   /// Example: https://forum.example.com
@@ -20,7 +20,7 @@ class AppForumConfig {
   ///   https://<sub>.ngrok-free.dev — Discourse must be launched with
   ///   `RAILS_DEVELOPMENT_HOSTS=.ngrok-free.dev,localhost` so the Rails
   ///   `HostAuthorization` middleware lets the tunnel hostname through.
-  static const String forumBaseUrl = 'https://try.discourse.org';
+  static const String forumBaseUrl = 'https://community.victoriouschristians.com';
 
   /// Legacy plugin endpoint path. **Not used in v1** — Discourse
   /// authentication and data fetching go through stock REST endpoints.
@@ -41,7 +41,7 @@ class AppForumConfig {
   /// this package for many forums cannot use a compile-time value and calls
   /// [setUserApiApplicationName] once at startup instead. Read
   /// [userApiApplicationName] everywhere; it honours the override.
-  static const String defaultUserApiApplicationName = 'Discourse Mobile';
+  static const String defaultUserApiApplicationName = 'Victorious Christians';
 
   static String? _userApiApplicationNameOverride;
 
