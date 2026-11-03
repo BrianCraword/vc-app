@@ -82,7 +82,7 @@ flutter test test/widget_test.dart -p chrome              # single file / single
 macOS-only utilities:
 
 ```bash
-./reset_storage.sh                    # wipes the local macOS app container (BUNDLE_ID=com.example.forumapp)
+./reset_storage.sh                    # wipes the local macOS app container (BUNDLE_ID=com.victoriouschristians.app)
 ```
 
 ## Editing notes

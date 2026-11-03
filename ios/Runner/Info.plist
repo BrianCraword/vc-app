@@ -11,7 +11,7 @@
 			<string>webcredentials:forum.example.com</string>
 		</array>
 	<key>CFBundleDisplayName</key>
-		<string>Forum App</string>
+		<string>Victorious Christians</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -19,7 +19,7 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>ForumApp</string>
+		<string>Victorious</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>

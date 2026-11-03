@@ -1,4 +1,4 @@
-package com.example.forumapp
+package com.victoriouschristians.app
 
 import android.os.Bundle
 import androidx.core.view.WindowCompat

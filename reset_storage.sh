@@ -1,24 +1,24 @@
 #!/bin/bash
 
-# Reset Local Storage for Forum App macOS App
+# Reset Local Storage for Victorious Christians macOS App
 # This script removes all app data including preferences, caches, and files
 
 set -e
 
-BUNDLE_ID="com.example.forumapp"
+BUNDLE_ID="com.victoriouschristians.app"
 CONTAINER_PATH="$HOME/Library/Containers/$BUNDLE_ID"
 PREFS_PATH="$HOME/Library/Preferences/${BUNDLE_ID}.plist"
 CACHES_PATH="$HOME/Library/Caches/$BUNDLE_ID"
 APP_SUPPORT_PATH="$HOME/Library/Application Support/$BUNDLE_ID"
 SAVED_STATE_PATH="$HOME/Library/Saved Application State/${BUNDLE_ID}.savedState"
 
-echo "🗑️  Forum App Storage Reset Utility"
+echo "🗑️  Victorious Christians Storage Reset Utility"
 echo "========================================"
 echo ""
 
 # Check if app is running
-if pgrep -f "Forum App" > /dev/null; then
-    echo "⚠️  WARNING: Forum App appears to be running!"
+if pgrep -f "Victorious Christians" > /dev/null; then
+    echo "⚠️  WARNING: Victorious Christians appears to be running!"
     echo "Please close the app before resetting storage."
     echo ""
     read -p "Do you want to continue anyway? (y/N) " -n 1 -r
