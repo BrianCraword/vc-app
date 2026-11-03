@@ -7,7 +7,7 @@ This guide explains how to reset all local storage for the Forum App macOS app.
 The app stores data in several locations:
 
 ### 1. SharedPreferences (Main Storage)
-- **Location**: `~/Library/Containers/com.example.forumapp/Data/Library/Preferences/com.example.forumapp.plist`
+- **Location**: `~/Library/Containers/com.victoriouschristians.app/Data/Library/Preferences/com.victoriouschristians.app.plist`
 - **Contains**:
   - User settings (theme, page size)
   - Site visit history
@@ -17,7 +17,7 @@ The app stores data in several locations:
   - Cache data
 
 ### 2. Application Support Directory
-- **Location**: `~/Library/Containers/com.example.forumapp/Data/Library/Application Support/com.example.forumapp/`
+- **Location**: `~/Library/Containers/com.victoriouschristians.app/Data/Library/Application Support/com.victoriouschristians.app/`
 - **Contains**: Additional app-specific files
 
 ### 3. Temporary Files
@@ -32,10 +32,10 @@ This removes **all** app data including preferences, caches, and files:
 
 ```bash
 # Close the app first, then run:
-rm -rf ~/Library/Containers/com.example.forumapp
+rm -rf ~/Library/Containers/com.victoriouschristians.app
 
 # Optional: Also clear preferences if stored separately
-rm -f ~/Library/Preferences/com.example.forumapp.plist
+rm -f ~/Library/Preferences/com.victoriouschristians.app.plist
 ```
 
 **What this does:**
@@ -50,10 +50,10 @@ If you want to keep some app data but reset settings:
 
 ```bash
 # Close the app first
-rm -f ~/Library/Containers/com.example.forumapp/Data/Library/Preferences/com.example.forumapp.plist
+rm -f ~/Library/Containers/com.victoriouschristians.app/Data/Library/Preferences/com.victoriouschristians.app.plist
 
 # Or delete the entire Preferences directory
-rm -rf ~/Library/Containers/com.example.forumapp/Data/Library/Preferences/
+rm -rf ~/Library/Containers/com.victoriouschristians.app/Data/Library/Preferences/
 ```
 
 ### Method 3: Using Finder (GUI Method)
@@ -62,7 +62,7 @@ rm -rf ~/Library/Containers/com.example.forumapp/Data/Library/Preferences/
 2. Open Finder
 3. Press `Cmd + Shift + G` (Go to Folder)
 4. Enter: `~/Library/Containers/`
-5. Find and delete the folder: `com.example.forumapp`
+5. Find and delete the folder: `com.victoriouschristians.app`
 6. Empty Trash
 
 ### Method 4: Clear Cache Only
@@ -72,7 +72,7 @@ To clear only temporary cached files:
 ```bash
 # Clear system temp files (may affect other apps, be careful)
 # Or clear app-specific cache:
-rm -rf ~/Library/Containers/com.example.forumapp/Data/Library/Caches/
+rm -rf ~/Library/Containers/com.victoriouschristians.app/Data/Library/Caches/
 ```
 
 ## Verification
@@ -81,13 +81,13 @@ After resetting, verify the storage is cleared:
 
 1. **Check SharedPreferences file:**
    ```bash
-   ls -la ~/Library/Containers/com.example.forumapp/Data/Library/Preferences/
+   ls -la ~/Library/Containers/com.victoriouschristians.app/Data/Library/Preferences/
    ```
    Should show "No such file or directory" if container was deleted.
 
 2. **Check container exists:**
    ```bash
-   ls -la ~/Library/Containers/com.example.forumapp
+   ls -la ~/Library/Containers/com.victoriouschristians.app
    ```
    Should show "No such file or directory" if container was deleted.
 

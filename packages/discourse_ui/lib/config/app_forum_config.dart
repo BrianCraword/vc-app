@@ -337,7 +337,7 @@ class AppForumConfig {
       ];
 
   /// Android package name used for passkey assetlinks validation.
-  static const String androidPackageName = 'com.example.forumapp';
+  static const String androidPackageName = 'com.victoriouschristians.app';
 
   /// SHA256 certificate fingerprint used for passkey validation.
   /// Leave empty until you configure your own signing certificate.
