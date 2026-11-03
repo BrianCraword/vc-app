@@ -179,11 +179,12 @@ class _Discourse extends DiscourseClient {
       return FCCallResult(statusCode: 200, body: this.body!);
     }
 
-    final publicKey = _publicKeyFromPem(query!['public_key']! as String);
+    final q = query!;
+    final publicKey = _publicKeyFromPem(q['public_key'] as String);
     final payload = _encrypt(otp, publicKey, oaep: oaep);
     wrapsBase64 = payload.contains('\n');
 
-    final redirect = Uri.parse(query!['auth_redirect']! as String).replace(
+    final redirect = Uri.parse(q['auth_redirect'] as String).replace(
       queryParameters: <String, String>{'oneTimePassword': payload},
     );
     return FCCallResult(
