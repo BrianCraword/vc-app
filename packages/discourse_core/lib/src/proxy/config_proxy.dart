@@ -10,6 +10,7 @@ import '../context/discourse_site_context_extension.dart';
 import '../data/attachment/discourse_media_optimization.dart';
 import '../data/attachment/discourse_upload_limits.dart';
 import '../data/emoji/discourse_emoji_set.dart';
+import '../data/site/discourse_sidebar_sections.dart';
 import '../data/site/discourse_site_capabilities.dart';
 
 /// Discourse implementation of [IFCConfigProxy].
@@ -211,6 +212,10 @@ class DiscourseConfigProxy extends BaseDiscourseProxy implements IFCConfigProxy 
         final site = await apiGetFresh('/site.json');
         if (_isCurrent(snapshot)) {
           DiscourseSiteCapabilities.store(siteContext.site.pluginUrl, site);
+          // The forum's own sidebar, for a reader with no session of their
+          // own yet. A signed-in member's `sidebar_sections` supersedes it.
+          DiscourseSidebarSections.storeFromSite(
+              siteContext.site.url, site['anonymous_sidebar_sections']);
         }
       } catch (e) {
         // ignore: avoid_print
