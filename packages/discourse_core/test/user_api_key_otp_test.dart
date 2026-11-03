@@ -88,8 +88,12 @@ void main() {
     final server = _Discourse(otp: 'deadbeef');
     final manager = DiscourseAuthManager(await signedIn(), client: server);
 
-    expect(server.wrapsBase64, isTrue, reason: 'guard: the fake must wrap');
-    expect(await mint(manager), '$url/session/otp/deadbeef');
+    final minted = await mint(manager);
+
+    expect(server.wrapsBase64, isTrue,
+        reason: 'guard: the fake must actually wrap, or this test proves '
+            'nothing — and it can only be checked after the request');
+    expect(minted, '$url/session/otp/deadbeef');
   });
 
   test('falls back to PKCS1 v1.5 when the forum ignores padding=oaep',
